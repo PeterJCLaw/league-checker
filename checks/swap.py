@@ -14,12 +14,14 @@ with open(sys.argv[1], 'w+') as f:
 
         find = sys.argv[2].upper()
         if find in parts:
+            print parts
             idx = parts.index(find)
             parts[idx] = sys.argv[3].upper()
+            print parts
 
-        line = '|'.join(parts)
-        lines[i] = line
-        break
+            line = '|'.join(parts)
+            lines[i] = line
+            break
 
     text = "\n".join(lines)
     f.seek(0)
