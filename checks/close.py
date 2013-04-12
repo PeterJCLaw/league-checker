@@ -1,5 +1,5 @@
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 import sys
 
 
@@ -32,4 +32,8 @@ for tla, matches in matches.iteritems():
 
 
 for tla, min_break, btla in sorted(min_breaks, key=lambda x:x[1]):
-    print "{0}\t{1}\t{2}".format(tla, min_break, btla)
+    c = Counter()
+    for x in sorted(btla):
+        c[x] += 1
+
+    print "{0}\t{1}\t{2}\t{3}".format(tla, min_break, c[min_break], btla)
