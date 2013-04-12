@@ -20,7 +20,7 @@ for line in lines:
 min_breaks = []
 
 for tla, matches in matches.iteritems():
-    last_match = 1
+    last_match = -25
     min_break = 200
     for match in matches:
         diff = match - last_match
