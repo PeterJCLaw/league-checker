@@ -11,6 +11,8 @@ breaks = defaultdict(lambda: [])
 match_num = 1
 
 for line in lines:
+    if line.strip() == "":
+        continue
     teams = line.strip().split('|')
     for tla in teams:
         matches[tla].append(int(match_num))
@@ -30,10 +32,14 @@ for tla, matches in matches.iteritems():
         last_match = match
     min_breaks.append((tla, min_break, breaks[tla]))
 
-
+count_n = 0
 for tla, min_break, btla in sorted(min_breaks, key=lambda x:x[1]):
     c = Counter()
     for x in sorted(btla):
         c[x] += 1
-
+    if min_break == 2:
+        count_n += 1
     print "{0}\t{1}\t{2}\t{3}".format(tla, min_break, c[min_break], btla)
+
+print
+print count_n
