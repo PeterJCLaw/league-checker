@@ -17,6 +17,8 @@ for line in lines:
 
     match_num += 1
 
+min_breaks = []
+
 for tla, matches in matches.iteritems():
     last_match = 1
     min_break = 200
@@ -26,5 +28,8 @@ for tla, matches in matches.iteritems():
         if diff < min_break:
             min_break = diff
         last_match = match
+    min_breaks.append((tla, min_break, breaks[tla]))
 
-    print "{0}\t{1}\t{2}".format(tla, min_break, breaks[tla])
+
+for tla, min_break, btla in sorted(min_breaks, key=lambda x:x[1]):
+    print "{0}\t{1}\t{2}".format(tla, min_break, btla)
