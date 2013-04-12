@@ -9,6 +9,7 @@ found_teams = []
 
 for line in lines:
     teams = [x.strip() for x in line.strip().split('|')]
+    print line
     assert len(set(teams)) == len(teams) == 4
     found_teams += teams
 

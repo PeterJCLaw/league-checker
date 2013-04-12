@@ -13,10 +13,11 @@ with open(sys.argv[1], 'w+') as f:
         parts = line.strip().split('|')
 
         find = sys.argv[2].upper()
-        if find in parts:
+        repl = sys.argv[3].upper()
+        if find in parts and not repl in parts:
             print parts
             idx = parts.index(find)
-            parts[idx] = sys.argv[3].upper()
+            parts[idx] = repl
             print parts
 
             line = '|'.join(parts)
