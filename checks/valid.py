@@ -6,7 +6,7 @@ if len(sys.argv) != 3 or '--help' in sys.argv:
     print '  Ensures that all the teams listed (one TLA per line) are in the schedule'
     exit(1)
 
-all_teams = [x.strip() for x in open(sys.argv[1], 'r').readlines()]
+all_teams = [x.strip() for x in open(sys.argv[2], 'r').readlines()]
 
 lines = open(sys.argv[1], 'r').readlines()
 
