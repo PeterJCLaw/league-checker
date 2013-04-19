@@ -1,7 +1,12 @@
 
 import sys
 
-all_teams = [x.strip() for x in open('teams-2013', 'r').readlines()]
+if len(sys.argv) != 3 or '--help' in sys.argv:
+    print 'Usage: valid.py <schedule-file> <teams-file>'
+    print '  Ensures that all the teams listed (one TLA per line) are in the schedule'
+    exit(1)
+
+all_teams = [x.strip() for x in open(sys.argv[1], 'r').readlines()]
 
 lines = open(sys.argv[1], 'r').readlines()
 

@@ -1,12 +1,17 @@
 
 import sys
 
+if len(sys.argv) != 2 or '--help' in sys.argv:
+    print 'Usage: swap.py <schedule-file> <find-tla> <replace-tla>'
+    print '  Searches for a match that contains the first team, but not the second'
+    print '  and replaces the first for the second in that match.'
+    exit(1)
+
 f = open(sys.argv[1])
 lines = f.read().split("\n")
 f.close()
 
 with open(sys.argv[1], 'w+') as f:
-
 
     for i in range(len(lines)):
         line = lines[i]

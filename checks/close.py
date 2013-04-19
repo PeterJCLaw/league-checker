@@ -2,6 +2,12 @@
 from collections import defaultdict, Counter
 import sys
 
+if len(sys.argv) != 2 or '--help' in sys.argv:
+    print 'Usage: close.py <schedule-file>'
+    print '  Displays statistics about how close the matches for all teams are.'
+    print '  A min-gap of 3 indicates that a team has a match, followed by two'
+    print '  match intervals off, and then another match.'
+    exit(1)
 
 lines = open(sys.argv[1], 'r').readlines()
 
@@ -31,6 +37,8 @@ for tla, matches in matches.iteritems():
             min_break = diff
         last_match = match
     min_breaks.append((tla, min_break, breaks[tla]))
+
+print 'Team\tMin-gap\tCount\tGaps'
 
 count_n = 0
 for tla, min_break, btla in sorted(min_breaks, key=lambda x:x[1]):
