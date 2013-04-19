@@ -9,7 +9,7 @@ if __name__ == "__main__":
         print '  Prints the number of matches each team has, sorted by match count'
         exit(1)
 
-    f = open(sys.argv[1]).read().split("\n")
+    f = open(sys.argv[1]).read().strip().split("\n")
 
     c = collections.Counter()
 
