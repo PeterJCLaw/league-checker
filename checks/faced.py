@@ -34,7 +34,7 @@ for tla, opponents in c.iteritems():
     missed = all_teams - set(opponents.keys())
     del opponents[tla]
     all_repeats = {}
-    lots_repeats = {}
+    lots_repeats = collections.Counter()
     faced = opponents.keys()
     for opp in faced:
         times = opponents[opp]
@@ -48,5 +48,10 @@ for tla, opponents in c.iteritems():
         print '{0} repeats {1} opponents lots of times: {2}'.format(tla, len(lots_repeats), lots_repeats)
         print '{0} misses {1} opponents: {2}'.format(tla, len(missed), missed)
     else:
-        print '{0: <4} faces {1: >2}, misses {2: >2}, repeats {3: >2} more than {4} times.' \
-                .format(tla, len(faced), len(missed), len(lots_repeats), LOTS_REPEATS_LIMIT)
+        print '{0: <4} faces {1: >2}, misses {2: >2}, repeats {3: >2} more than {4} times' \
+                .format(tla, len(faced), len(missed), len(lots_repeats), LOTS_REPEATS_LIMIT),
+        if len(lots_repeats) > 1:
+            worst = lots_repeats.most_common(1)[0]
+            if worst[1] > 10:
+                print '(including {0} {1} times)'.format(*worst),
+        print
