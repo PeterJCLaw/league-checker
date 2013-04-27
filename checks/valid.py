@@ -13,13 +13,16 @@ lines = open(sys.argv[1], 'r').readlines()
 found_teams = []
 
 for line in lines:
+    line = line.strip()
+    if len(line) == 0:
+        continue
     teams = [x.strip() for x in line.strip().split('|')]
     #print line
-    assert len(set(teams)) == len(teams) == 4
+    assert len(set(teams)) == len(teams) == 4, teams
     found_teams += teams
 
 # Sanity
-assert len(set(all_teams)) == len(all_teams)
+assert len(set(all_teams)) == len(all_teams), all_teams
 
 # Sanity
 missing_teams = set(all_teams) - set(found_teams)
