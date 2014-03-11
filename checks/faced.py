@@ -12,7 +12,11 @@ if len(sys.argv) != 2 or '--help' in sys.argv:
 matches = []
 lines = [x.strip() for x in open(sys.argv[1])]
 for line in lines:
-    matches.append(line.split('|'))
+    players = line.split('|')
+    while len(players) > 4:
+        matches.append(players[0:3])
+        players = players[4:]
+    matches.append(players[0:3])
 
 c = collections.defaultdict(collections.Counter)
 
