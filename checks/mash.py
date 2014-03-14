@@ -46,16 +46,3 @@ for tla, opponents in c.iteritems():
             all_repeats[opp] = times
         if times > LOTS_REPEATS_LIMIT:
             lots_repeats[opp] = times
-    if VERBOSE:
-        print '{0} faces {1} opponents: {2}'.format(tla, len(faced), faced)
-        print '{0} repeats {1} opponents: {2}'.format(tla, len(all_repeats), all_repeats)
-        print '{0} repeats {1} opponents lots of times: {2}'.format(tla, len(lots_repeats), lots_repeats)
-        print '{0} misses {1} opponents: {2}'.format(tla, len(missed), missed)
-    else:
-        print '{0: <4} faces {1: >2}, misses {2: >2}, repeats {3: >2} more than {4} times' \
-                .format(tla, len(faced), len(missed), len(lots_repeats), LOTS_REPEATS_LIMIT),
-        if len(lots_repeats) > 1:
-            worst = lots_repeats.most_common(1)[0]
-            if worst[1] > 10:
-                print '(including {0} {1} times)'.format(*worst),
-        print
