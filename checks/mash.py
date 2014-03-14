@@ -18,10 +18,13 @@ for line in lines:
 
 c = collections.defaultdict(collections.Counter)
 
-for match in matches:
+def calc_faced_in_match(match, container):
     for tla in match:
         for faces in match:
-            c[tla][faces] += 1
+            container[tla][faces] += 1
+
+for match in matches:
+    calc_faced_in_match(match, c)
 
 all_teams = set(c.keys())
 
