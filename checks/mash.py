@@ -35,12 +35,19 @@ for match in matches:
 
 all_teams = set(c.keys())
 
-for tla, opponents in c.iteritems():
-    missed = all_teams - set(opponents.keys())
-    del opponents[tla]
-    all_repeats = {}
-    faced = opponents.keys()
-    for opp in faced:
-        times = opponents[opp]
-        if times > 1:
-            all_repeats[opp] = times
+# Calculate a dictionary of how many times repeats happen: the size of the
+# repeat maps to the number of times it happens. Due to an artifact of how
+# this is counted, the "number of times" is twice as large as reality
+def calc_scoring(c):
+    output = collections.defaultdict(collections.Counter)
+
+    for tla, opponents in c.iteritems():
+        missed = all_teams - set(opponents.keys())
+        del opponents[tla]
+        all_repeats = {}
+        faced = opponents.keys()
+        for opp in faced:
+            times = opponents[opp]
+            output[times] += 1
+
+    return output
