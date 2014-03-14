@@ -2,8 +2,8 @@
 import collections
 import sys
 
-if len(sys.argv) != 2 or '--help' in sys.argv:
-    print 'Usage: faced.py <schedule-file>'
+if len(sys.argv) != 3 or '--help' in sys.argv:
+    print 'Usage: faced.py schedule-file matchno'
     print '  Displays statistics about which others a team have faced'
     exit(1)
 
