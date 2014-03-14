@@ -25,10 +25,6 @@ for match in matches:
 
 all_teams = set(c.keys())
 
-# total appearances / teams => max appearances per team
-# 4.0 is teams-per-match
-matches_per_team = int(round(len(matches) * 4.0 / len(all_teams)))
-
 for tla, opponents in c.iteritems():
     missed = all_teams - set(opponents.keys())
     del opponents[tla]
