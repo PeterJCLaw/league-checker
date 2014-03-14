@@ -2,8 +2,6 @@
 import collections
 import sys
 
-VERBOSE = False
-
 if len(sys.argv) != 2 or '--help' in sys.argv:
     print 'Usage: faced.py <schedule-file>'
     print '  Displays statistics about which others a team have faced'
@@ -31,18 +29,12 @@ all_teams = set(c.keys())
 # 4.0 is teams-per-match
 matches_per_team = int(round(len(matches) * 4.0 / len(all_teams)))
 
-# 4.0 means this is 1/4 of a team's matches
-LOTS_REPEATS_LIMIT = int(round(matches_per_team / 4.0))
-
 for tla, opponents in c.iteritems():
     missed = all_teams - set(opponents.keys())
     del opponents[tla]
     all_repeats = {}
-    lots_repeats = collections.Counter()
     faced = opponents.keys()
     for opp in faced:
         times = opponents[opp]
         if times > 1:
             all_repeats[opp] = times
-        if times > LOTS_REPEATS_LIMIT:
-            lots_repeats[opp] = times
