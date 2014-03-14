@@ -23,8 +23,15 @@ def calc_faced_in_match(match, container):
         for faces in match:
             container[tla][faces] += 1
 
+# Calculate how many times each team faces each other, except in the selected
+# match
+cur_match_no = 0
 for match in matches:
+    if cur_match_no == int(sys.argv[2]):
+        continue
+
     calc_faced_in_match(match, c)
+    cur_match_no += 1
 
 all_teams = set(c.keys())
 
