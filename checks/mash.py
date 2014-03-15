@@ -38,17 +38,23 @@ all_teams = set(c.keys())
 # Calculate a dictionary of how many times repeats happen: the size of the
 # repeat maps to the number of times it happens. Due to an artifact of how
 # this is counted, the "number of times" is twice as large as reality
-def calc_scoring(c):
-    output = collections.defaultdict(collections.Counter)
+def calc_scoring(sched):
+    # Something involving defaults would be better, but requires thought
+    output = dict()
+    for i in range(len(matches)):
+        output[i] = 0
 
-    for tla, opponents in c.iteritems():
-        missed = all_teams - set(opponents.keys())
+    for tla, opponents in sched.iteritems():
         del opponents[tla]
-        all_repeats = {}
         faced = opponents.keys()
         for opp in faced:
             times = opponents[opp]
             output[times] += 1
+
+    # Remove repeats with zero count
+    for i in output.keys():
+        if output[i] == 0:
+            del output[i]
 
     return output
 
