@@ -2,6 +2,7 @@
 import collections
 import sys
 import copy
+from functools import cmp_to_key
 
 if len(sys.argv) != 3 or '--help' in sys.argv:
     print 'Usage: faced.py schedule-file matchno'
@@ -141,3 +142,11 @@ for m in unique_matches:
     calc_faced_in_match([g2p1, g2p2, g2p3, g2p4], score)
 
     scorelist.append((score, m))
+
+def sortlist_cmp(x, y):
+    # Project out the score, from the match
+    xs, xm = x
+    ys, ym = y
+    return scoring_cmp(xs, ys)
+
+scorelist = sorted(scorelist, key=cmp_to_key(sortlist_cmp))
