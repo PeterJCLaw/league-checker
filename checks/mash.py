@@ -168,7 +168,15 @@ def sortlist_cmp(x, y):
 
 scorelist = sorted(scorelist, key=cmp_to_key(sortlist_cmp))
 
+class bcolours:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
 for m in scorelist:
     score, match = m
-    print "Match " + repr(match)
-    print "  scored: " + repr(score)
+    print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
+    print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
