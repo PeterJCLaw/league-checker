@@ -54,7 +54,6 @@ for match in matches:
         # Store earlier matches for checking closeness criteria
         middle_idx = cur_match_no - 1
         firstidx = max(0, middle_idx - args.closeness)
-        print "firstidx " + str(firstidx)
         forward_matches = matches[firstidx:middle_idx]
 
         cur_match_no += 1
@@ -65,6 +64,17 @@ for match in matches:
 
 num_after_matches = min(middle_idx + args.closeness, len(matches))
 after_matches = matches[middle_idx:num_after_matches]
+
+# Calculate the teams who'll conflict with players in our matches in multimatch
+# mode
+
+forward_teams = []
+for match in forward_matches:
+    forward_teams += match
+
+after_teams = []
+for match in after_teams:
+    after_teams += match
 
 all_teams = set(c.keys())
 
