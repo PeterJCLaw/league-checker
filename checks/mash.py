@@ -137,9 +137,10 @@ for m in unique_matches:
     g1p1, g1p2, g1p3, g1p4 = g1
     g2p1, g2p2, g2p3, g2p4 = g2
 
-    score = copy.deepcopy(c)
-    calc_faced_in_match([g1p1, g1p2, g1p3, g1p4], score)
-    calc_faced_in_match([g2p1, g2p2, g2p3, g2p4], score)
+    sched = copy.deepcopy(c)
+    calc_faced_in_match([g1p1, g1p2, g1p3, g1p4], sched)
+    calc_faced_in_match([g2p1, g2p2, g2p3, g2p4], sched)
+    score = calc_scoring(sched)
 
     scorelist.append((score, m))
 
