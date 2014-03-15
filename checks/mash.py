@@ -102,10 +102,10 @@ unique_games = set()
 # and canonicalising the order to avoid equivalent orderings being inserted.
 from itertools import product
 for comb in product(the_match, repeat=4):
-    if len(comb) != 4:
+    # Duplicate members?
+    if len(set(comb)) != 4:
         continue
 
     comb = sorted(comb)
     astuple = (comb[0], comb[1], comb[2], comb[3])
     unique_games.add(astuple)
-print len(unique_games)
