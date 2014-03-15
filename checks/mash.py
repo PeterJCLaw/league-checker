@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import collections
 import sys
+import copy
 
 if len(sys.argv) != 3 or '--help' in sys.argv:
     print 'Usage: faced.py schedule-file matchno'
@@ -127,4 +128,16 @@ for comb in product(unique_games, repeat=2):
         continue
     unique_matches.add((g1, g2))
 
-print len(unique_matches)
+# Now for some actual scoring. For each match, duplicate the scoring dictionary
+# for the rest of the schedule, and add the generated match to that scoring.
+scorelist = []
+for m in unique_matches:
+    g1, g2 = m
+    g1p1, g1p2, g1p3, g1p4 = g1
+    g2p1, g2p2, g2p3, g2p4 = g2
+
+    score = copy.deepcopy(c)
+    calc_faced_in_match([g1p1, g1p2, g1p3, g1p4], score)
+    calc_faced_in_match([g2p1, g2p2, g2p3, g2p4], score)
+
+    scorelist.append((score, m))
