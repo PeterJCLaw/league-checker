@@ -3,14 +3,17 @@ import collections
 import sys
 import copy
 from functools import cmp_to_key
+import argparse
 
-if len(sys.argv) != 3 or '--help' in sys.argv:
-    print 'Usage: faced.py schedule-file matchno'
-    print '  Displays statistics about which others a team have faced'
-    exit(1)
+ap = argparse.ArgumentParser(description="Identify teams that can be swapped between games inside matches")
+ap.add_argument("infile", help="Input schedule")
+ap.add_argument("matchno", help="Which match number to fiddle with")
+ap.add_argument("--auto-alter", help="Print the schedule with specified match patched")
+
+args = ap.parse_args()
 
 matches = []
-lines = [x.strip() for x in open(sys.argv[1])]
+lines = [x.strip() for x in open(args.infile)]
 for line in lines:
     if len(line) > 0 and line[0] == '#':
         continue
@@ -35,7 +38,7 @@ def calc_faced_in_match(match, container):
 # match
 cur_match_no = 0
 for match in matches:
-    if cur_match_no == int(sys.argv[2]):
+    if cur_match_no == int(args.matchno):
         cur_match_no += 1
         continue
 
@@ -109,7 +112,7 @@ def scoring_cmp(x, y):
         return 0
 
 # Select the desired match
-the_match = matches[int(sys.argv[2])]
+the_match = matches[int(args.matchno)]
 
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
