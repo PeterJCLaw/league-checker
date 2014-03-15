@@ -11,11 +11,12 @@ ap.add_argument("matchno", type=int, help="Which match number to fiddle with")
 ap.add_argument("--auto-alter", action="store_true", help="Print the schedule with specified match patched")
 ap.add_argument("--multimatch", action="store_true", help="Consider swapping teams between this and the next match")
 ap.add_argument("--matches", type=int, default=0, help="Number of matches in each round")
+ap.add_argument("--closeness", type=int, default=0, help="Closeness criteria")
 
 args = ap.parse_args()
 
-if args.multimatch and args.matches == 0:
-    print >>sys.stderr, "Matches option required for doing multimatch calcs"
+if args.multimatch and (args.matches == 0 or args.closeness == 0):
+    print >>sys.stderr, "Matches and closeness options required for doing multimatch calcs"
     sys.exit(1)
 
 matches = []
