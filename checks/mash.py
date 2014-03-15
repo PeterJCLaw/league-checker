@@ -108,4 +108,5 @@ for comb in product(the_match, repeat=4):
 
     comb = sorted(comb)
     astuple = (comb[0], comb[1], comb[2], comb[3])
-    unique_games.add(astuple)
+    if astuple not in unique_games:
+        unique_games.add(astuple)
