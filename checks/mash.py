@@ -179,6 +179,7 @@ class bcolours:
 for m in scorelist:
     score, match = m
 
+    g1, g2 = match
     g1p1, g1p2, g1p3, g1p4 = g1
     g2p1, g2p2, g2p3, g2p4 = g2
     normalised = "|".join([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])
