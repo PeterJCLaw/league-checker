@@ -27,6 +27,7 @@ def calc_faced_in_match(match, container):
 cur_match_no = 0
 for match in matches:
     if cur_match_no == int(sys.argv[2]):
+        cur_match_no += 1
         continue
 
     calc_faced_in_match(match, c)
