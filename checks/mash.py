@@ -115,8 +115,16 @@ for comb in product(the_match, repeat=4):
 # match but in a different order being found.
 unique_matches = set()
 for comb in product(unique_games, repeat=2):
+    # Test that we actually have all 8 players playing in this match.
+    g1p1, g1p2, g1p3, g1p4 = comb[0]
+    g2p1, g2p2, g2p3, g2p4 = comb[1]
+    if len(set([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])) != 8:
+        continue
+
     g1 = comb[0]
     g2 = comb[1]
     if (g2, g1) in unique_matches:
         continue
     unique_matches.add((g1, g2))
+
+print len(unique_matches)
