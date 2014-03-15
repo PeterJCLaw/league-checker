@@ -235,7 +235,14 @@ if not args.multimatch:
 
         scorelist.append((score, m))
 else:
-    pass
+    for m in match_pairs:
+        m1, m2 = m
+        sched = copy.deepcopy(c)
+        sched = add_generated_match_sched(m1, sched)
+        sched = add_generated_match_sched(m2, sched)
+        score = calc_scoring(sched)
+
+        scorelist.append((score, m))
 
 def sortlist_cmp(x, y):
     # Project out the score, from the match
@@ -254,17 +261,38 @@ class bcolours:
     ENDC = '\033[0m'
 
 if not args.auto_alter:
-    for m in scorelist:
-        score, match = m
+    if not args.multimatch:
+        for m in scorelist:
+            score, match = m
 
-        g1, g2 = match
-        plist = list(g1)
-        plist += list(g2)
-        normalised = "|".join(plist)
+            g1, g2 = match
+            plist = list(g1)
+            plist += list(g2)
+            normalised = "|".join(plist)
 
-        print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
-        print "  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC
-        print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+            print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
+            print "  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC
+            print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+    else:
+        for m in scorelist:
+            score, match = m
+
+            match1, match2 = match
+            m1g1, m1g2 = match1
+            m2g1, m2g2 = match2
+            plist = list(m1g1)
+            plist += list(m1g2)
+            normalised1 = "|".join(plist)
+            plist = list(m2g1)
+            plist += list(m2g2)
+            normalised2 = "|".join(plist)
+
+            print "Match " + bcolours.OKGREEN +  repr(match1) + bcolours.ENDC
+            print "      " + bcolours.OKGREEN +  repr(match2) + bcolours.ENDC
+            print "  normalised as " + bcolours.OKBLUE + normalised1 + bcolours.ENDC
+            print "                " + bcolours.OKBLUE + normalised2 + bcolours.ENDC
+            print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+
 
     sys.exit(0)
 
