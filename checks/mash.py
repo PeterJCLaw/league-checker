@@ -179,14 +179,39 @@ class bcolours:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
-for m in scorelist:
-    score, match = m
+if not args.auto_alter:
+    for m in scorelist:
+        score, match = m
 
-    g1, g2 = match
-    g1p1, g1p2, g1p3, g1p4 = g1
-    g2p1, g2p2, g2p3, g2p4 = g2
-    normalised = "|".join([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])
+        g1, g2 = match
+        g1p1, g1p2, g1p3, g1p4 = g1
+        g2p1, g2p2, g2p3, g2p4 = g2
+        normalised = "|".join([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])
 
-    print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
-    print "  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC
-    print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+        print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
+        print "  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC
+        print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+
+    sys.exit(0)
+
+# Auto alter is enabled: re-read the input file, printing out every line
+# except the desired match, replacing it with the optimal match found.
+
+cur_match_no = 0
+for line in lines:
+    if len(line) > 0 and line[0] == '#':
+        continue
+
+    if cur_match_no == args.matchno:
+        # Replace it. Pick the optimal ordering, which is the last in the list
+        bestscore, bestmatch = scorelist[-1]
+        g1, g2 = bestmatch
+        g1p1, g1p2, g1p3, g1p4 = g1
+        g2p1, g2p2, g2p3, g2p4 = g2
+        normalised = "|".join([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])
+        print normalised
+    else:
+        # Just print it
+        print line
+
+    cur_match_no += 1
