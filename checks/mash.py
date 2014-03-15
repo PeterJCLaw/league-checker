@@ -52,21 +52,30 @@ def calc_scoring(c):
 
     return output
 
+# Define a comparator about the score a particular match configuration has.
+# A 'better' score is one where the largest magnitude of repeat is less than
+# another, i.e. a schedule with some 3-times repeats is better than one with
+# any 4-time repeats.
+# Failing that, the number of repeats is compared, in reducing magnitude, so
+# a schedule with 20 3-time repeats is worse than one with 15 of them.
 def scoring_cmp(x, y):
     xkeys = x.keys()
     ykeys = y.keys()
 
     if xkeys != ykeys:
-        # One of these dicts has a higher count of repeats than the other.
+        # One of these dicts has a higher magnitude of repeats than the other.
         xkeys = sorted(xkeys, reverse=True)
         ykeys = sorted(ykeys, reverse=True)
 
+        # Find the highest magnitude of repeat
         highest = 0
         if xkeys[0] > ykeys[0]:
             highest = xkeys[0]
         else:
             highest = ykeys[0]
 
+        # Decrease from there, finding where which schedule, x or y, has a
+        # magnitude of repeat that the other doesn't
         for i in reversed(range(highest)):
             if i in xkeys and i not in ykeys:
                 return 1
@@ -74,7 +83,8 @@ def scoring_cmp(x, y):
                 return -1
         return 0
     else:
-        # They have the same set of keys.
+        # The schedules have the same set of keys: compare the number of times
+        # that each magnitude of repeats occurs
         xkeys = sorted(xkeys, reverse=True)
         for i in xkeys:
             if x[i] < y[i]:
