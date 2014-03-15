@@ -181,6 +181,30 @@ for comb in product(unique_games, repeat=2):
         continue
     unique_matches.add((g1, g2))
 
+# In multimatch mode, turn the unique matches set into a set of match pairs.
+match_pairs = set()
+if args.multimatch:
+    for comb in product(unique_matches, repeat=2):
+        m1, m2 = comb
+        (m1g2p1, m1g2p2, m1g2p3, m1g2p4), (m1g2p1, m1g2p2, m1g2p3, m1g2p4) = m1
+        (m2g1p1, m2g1p2, m2g1p3, m2g1p4), (m2g2p1, m2g2p2, m2g2p3, m2g2p4) = m2
+        allteams = [m1g2p1, m1g2p2, m1g2p3, m1g2p4]
+        allteams += [m1g2p1, m1g2p2, m1g2p3, m1g2p4]
+        allteams += [m2g1p1, m2g1p2, m2g1p3, m2g1p4]
+        allteams += [m2g2p1, m2g2p2, m2g2p3, m2g2p4]
+        if len(set(allteams)) != 16:
+            continue
+
+        # That's checked uniqueness. Now look for closeness hazards.
+        if x in allteams[0:8] in after_teams:
+            continue
+        if x in allteams[8:16] in forward_teams:
+            continue
+
+        match_pairs.add(comb)
+
+print "lolwat"
+
 # Now for some actual scoring. For each match, duplicate the scoring dictionary
 # for the rest of the schedule, and add the generated match to that scoring.
 
