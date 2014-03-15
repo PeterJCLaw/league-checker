@@ -157,22 +157,19 @@ unique_games = set()
 from itertools import product
 for comb in product(the_teams, repeat=4):
     # Duplicate members?
-    if len(set(comb)) != 4:
+    theset = frozenset(comb)
+    if len(theset) != 4:
         continue
 
-    comb = sorted(comb)
-    astuple = (comb[0], comb[1], comb[2], comb[3])
-    if astuple not in unique_games:
-        unique_games.add(astuple)
+    if theset not in unique_games:
+        unique_games.add(theset)
 
 # Combine the set of unique games into a set of matches. Guard against the same
 # match but in a different order being found.
 unique_matches = set()
 for comb in product(unique_games, repeat=2):
     # Test that we actually have all 8 players playing in this match.
-    g1p1, g1p2, g1p3, g1p4 = comb[0]
-    g2p1, g2p2, g2p3, g2p4 = comb[1]
-    if len(set([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])) != 8:
+    if not comb[0].isdisjoint(comb[1]):
         continue
 
     g1 = comb[0]
@@ -186,19 +183,19 @@ match_pairs = set()
 if args.multimatch:
     for comb in product(unique_matches, repeat=2):
         m1, m2 = comb
-        (m1g2p1, m1g2p2, m1g2p3, m1g2p4), (m1g2p1, m1g2p2, m1g2p3, m1g2p4) = m1
-        (m2g1p1, m2g1p2, m2g1p3, m2g1p4), (m2g2p1, m2g2p2, m2g2p3, m2g2p4) = m2
-        allteams = [m1g2p1, m1g2p2, m1g2p3, m1g2p4]
-        allteams += [m1g2p1, m1g2p2, m1g2p3, m1g2p4]
-        allteams += [m2g1p1, m2g1p2, m2g1p3, m2g1p4]
-        allteams += [m2g2p1, m2g2p2, m2g2p3, m2g2p4]
-        if len(set(allteams)) != 16:
+        set1, set2 = m1
+        set3, set4 = m2
+        if len(set1 | set2 | set3 | set4) != 16:
             continue
 
         # That's checked uniqueness. Now look for closeness hazards.
-        if x in allteams[0:8] in after_teams:
+        if x in set1 in after_teams:
             continue
-        if x in allteams[8:16] in forward_teams:
+        if x in set2 in after_teams:
+            continue
+        if x in set3 in forward_teams:
+            continue
+        if x in set4 in forward_teams:
             continue
 
         match_pairs.add(comb)
@@ -210,11 +207,9 @@ print "lolwat"
 
 def add_generated_match_sched(m, sched):
     g1, g2 = m
-    g1p1, g1p2, g1p3, g1p4 = g1
-    g2p1, g2p2, g2p3, g2p4 = g2
 
-    calc_faced_in_match([g1p1, g1p2, g1p3, g1p4], sched)
-    calc_faced_in_match([g2p1, g2p2, g2p3, g2p4], sched)
+    calc_faced_in_match(list(g1), sched)
+    calc_faced_in_match(list(g2), sched)
     return sched
 
 scorelist = []
@@ -249,9 +244,9 @@ if not args.auto_alter:
         score, match = m
 
         g1, g2 = match
-        g1p1, g1p2, g1p3, g1p4 = g1
-        g2p1, g2p2, g2p3, g2p4 = g2
-        normalised = "|".join([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])
+        plist = list(g1)
+        plist += list(g2)
+        normalised = "|".join(plist)
 
         print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
         print "  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC
@@ -272,9 +267,9 @@ for line in lines:
         # Replace it. Pick the optimal ordering, which is the last in the list
         bestscore, bestmatch = scorelist[-1]
         g1, g2 = bestmatch
-        g1p1, g1p2, g1p3, g1p4 = g1
-        g2p1, g2p2, g2p3, g2p4 = g2
-        normalised = "|".join([g1p1, g1p2, g1p3, g1p4, g2p1, g2p2, g2p3, g2p4])
+        plist = list(g1)
+        plist += list(g2)
+        normalised = "|".join(plist)
         print normalised
     else:
         # Just print it
