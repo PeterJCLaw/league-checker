@@ -12,6 +12,9 @@ if len(sys.argv) != 3 or '--help' in sys.argv:
 matches = []
 lines = [x.strip() for x in open(sys.argv[1])]
 for line in lines:
+    if len(line) > 0 and line[0] == '#':
+        continue
+
     players = line.split('|')
     matches.append(players)
 

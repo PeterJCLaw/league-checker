@@ -19,6 +19,10 @@ match_num = 1
 for line in lines:
     if line.strip() == "":
         continue
+
+    if len(line) > 0 and line[0] == '#':
+        continue
+
     teams = line.strip().split('|')
     for tla in teams:
         matches[tla].append(int(match_num))

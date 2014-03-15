@@ -14,6 +14,9 @@ found_teams = []
 
 for line in lines:
     line = line.strip()
+    if len(line) > 0 and line[0] == '#':
+        continue
+
     if len(line) == 0:
         continue
     teams = [x.strip() for x in line.strip().split('|')]
