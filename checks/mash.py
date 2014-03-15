@@ -19,6 +19,10 @@ if args.multimatch and (args.matches == 0 or args.closeness == 0):
     print >>sys.stderr, "Matches and closeness options required for doing multimatch calcs"
     sys.exit(1)
 
+if args.multimatch and ((args.matchno + 1) % args.matches) == 0:
+    print >>sys.stderr, "Can't multi-match schedule over round boundries, skipping this one"
+    args.multimatch = False
+
 matches = []
 lines = [x.strip() for x in open(args.infile)]
 for line in lines:
