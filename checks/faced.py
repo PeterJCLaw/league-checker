@@ -14,9 +14,9 @@ lines = [x.strip() for x in open(sys.argv[1])]
 for line in lines:
     players = line.split('|')
     while len(players) > 4:
-        matches.append(players[0:3])
+        matches.append(players[0:4])
         players = players[4:]
-    matches.append(players[0:3])
+    matches.append(players[0:4])
 
 c = collections.defaultdict(collections.Counter)
 
