@@ -91,11 +91,11 @@ def scoring_cmp(x, y):
 
         # Decrease from there, finding where which schedule, x or y, has a
         # magnitude of repeat that the other doesn't
-        for i in reversed(range(highest)):
+        for i in reversed(range(highest+1)):
             if i in xkeys and i not in ykeys:
-                return 1
-            elif i in ykeys and i not in xkeys:
                 return -1
+            elif i in ykeys and i not in xkeys:
+                return 1
         return 0
     else:
         # The schedules have the same set of keys: compare the number of times
@@ -103,9 +103,9 @@ def scoring_cmp(x, y):
         xkeys = sorted(xkeys, reverse=True)
         for i in xkeys:
             if x[i] < y[i]:
-                return -1
-            elif x[i] > y[i]:
                 return 1
+            elif x[i] > y[i]:
+                return -1
         return 0
 
 # Select the desired match
