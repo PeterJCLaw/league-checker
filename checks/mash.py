@@ -17,10 +17,16 @@ for line in lines:
 
 c = collections.defaultdict(collections.Counter)
 
-def calc_faced_in_match(match, container):
-    for tla in match:
-        for faces in match:
+def calc_faced_in_game(game, container):
+    for tla in game:
+        for faces in game:
             container[tla][faces] += 1
+
+def calc_faced_in_match(match, container):
+    while len(match) > 4:
+        calc_faced_in_game(match[0:4], container)
+        match = match[4:]
+    calc_faced_in_game(match, container)
 
 # Calculate how many times each team faces each other, except in the selected
 # match
