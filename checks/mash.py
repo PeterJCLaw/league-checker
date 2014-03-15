@@ -200,6 +200,7 @@ if not args.auto_alter:
 cur_match_no = 0
 for line in lines:
     if len(line) > 0 and line[0] == '#':
+        print line
         continue
 
     if cur_match_no == args.matchno:
