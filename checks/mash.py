@@ -101,6 +101,17 @@ def calc_scoring(sched):
 
     return output
 
+def merge_scores(sched1, sched2):
+    merged = dict()
+    common = set(sched1.keys()) & set(sched2.keys())
+    merged.update(sched1)
+    merged.update(sched2)
+
+    for key in common:
+        merged[key] = sched1[key] + sched2[key]
+
+    return merged
+
 # Define a comparator about the score a particular match configuration has.
 # A 'better' score is one where the largest magnitude of repeat is less than
 # another, i.e. a schedule with some 3-times repeats is better than one with
@@ -226,21 +237,26 @@ def add_generated_match_sched(m, sched):
     calc_faced_in_match(list(g2), sched)
     return sched
 
+print "num of match pairs " + str(len(match_pairs))
+
 scorelist = []
+overall_score = calc_scoring(c)
 if not args.multimatch:
     for m in unique_matches:
-        sched = copy.deepcopy(c)
+        sched = collections.defaultdict(collections.Counter)
         sched = add_generated_match_sched(m, sched)
         score = calc_scoring(sched)
+        score = merge_scores(score, overall_score)
 
         scorelist.append((score, m))
 else:
     for m in match_pairs:
         m1, m2 = m
-        sched = copy.deepcopy(c)
+        sched = collections.defaultdict(collections.Counter)
         sched = add_generated_match_sched(m1, sched)
         sched = add_generated_match_sched(m2, sched)
         score = calc_scoring(sched)
+        score = merge_scores(score, overall_score)
 
         scorelist.append((score, m))
 
