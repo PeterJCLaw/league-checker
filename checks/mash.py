@@ -340,6 +340,8 @@ for line in lines:
             plist = list(g3)
             plist += list(g4)
             print "|".join(plist)
+    elif args.multimatch and cur_match_no == args.matchno + 1:
+        pass # already printed it
     else:
         # Just print it
         print line
