@@ -144,8 +144,11 @@ def scoring_cmp(x, y):
 
 # Select the desired match
 the_teams = matches[int(args.matchno)]
+first_match = frozenset(the_teams)
+second_match = set(the_teams)
 if args.multimatch:
     the_teams = the_teams + matches[args.matchno + 1]
+    second_match = frozenset(matches[args.matchno + 1])
 
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
@@ -174,6 +177,19 @@ for comb in product(unique_games, repeat=2):
 
     g1 = comb[0]
     g2 = comb[1]
+
+    # In multimatch mode, check that the match is either a completely unchanged
+    # set of teams from either match, or only has one team difference. This
+    # means we only explore one pair of teams swapping matches, keeping the size
+    # of exploration feasible.
+    if args.multimatch:
+        both = g1 | g2
+        inter_first = both & first_match
+
+        thelen = len(inter_first)
+        if thelen != 0 and thelen != 1 and thelen != 7 and thelen != 8:
+            continue
+
     if (g2, g1) in unique_matches:
         continue
     unique_matches.add((g1, g2))
