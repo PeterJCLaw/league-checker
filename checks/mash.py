@@ -121,7 +121,9 @@ def scoring_cmp(x, y):
         return 0
 
 # Select the desired match
-the_match = matches[int(args.matchno)]
+the_teams = matches[int(args.matchno)]
+if args.multimatch:
+    the_teams = the_teams + matches[args.matchno + 1]
 
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
@@ -131,7 +133,7 @@ unique_games = set()
 # Generate all possible 4-team combinations via generating all combinations,
 # and canonicalising the order to avoid equivalent orderings being inserted.
 from itertools import product
-for comb in product(the_match, repeat=4):
+for comb in product(the_teams, repeat=4):
     # Duplicate members?
     if len(set(comb)) != 4:
         continue
