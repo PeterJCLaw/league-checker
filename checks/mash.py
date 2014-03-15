@@ -96,19 +96,16 @@ the_match = matches[int(sys.argv[2])]
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
 
-unique_matches = set()
+unique_games = set()
 
 # Generate all possible 4-team combinations via generating all combinations,
-# stripping out non-4-team combinations, and canonicalising the order to avoid
-# equivalent orderings being inserted. This is overkill, but simple to
-# understand
+# and canonicalising the order to avoid equivalent orderings being inserted.
 from itertools import product
-print len(the_match)
-print str(the_match)
-for comb in product(the_match, repeat=len(the_match)):
+for comb in product(the_match, repeat=4):
     if len(comb) != 4:
         continue
 
-    unique_matches.insert(sorted(comb))
-
-print len(unique_matches)
+    comb = sorted(comb)
+    astuple = (comb[0], comb[1], comb[2], comb[3])
+    unique_games.add(astuple)
+print len(unique_games)
