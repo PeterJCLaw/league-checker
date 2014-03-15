@@ -268,7 +268,7 @@ def sortlist_cmp(x, y):
     ys, ym = y
     return scoring_cmp(xs, ys)
 
-scorelist = [min(scorelist, key=cmp_to_key(sortlist_cmp))]
+scorelist = [max(scorelist, key=cmp_to_key(sortlist_cmp))]
 
 class bcolours:
     HEADER = '\033[95m'
