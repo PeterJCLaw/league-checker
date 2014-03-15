@@ -167,4 +167,5 @@ scorelist = sorted(scorelist, key=cmp_to_key(sortlist_cmp))
 
 for m in scorelist:
     score, match = m
-    print "Match " + repr(match) + " scored " + repr(score)
+    print "Match " + repr(match)
+    print "  scored: " + repr(score)
