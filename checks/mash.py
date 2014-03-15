@@ -194,12 +194,15 @@ def add_generated_match_sched(m, sched):
     return sched
 
 scorelist = []
-for m in unique_matches:
-    sched = copy.deepcopy(c)
-    sched = add_generated_match_sched(m, sched)
-    score = calc_scoring(sched)
+if not args.multimatch:
+    for m in unique_matches:
+        sched = copy.deepcopy(c)
+        sched = add_generated_match_sched(m, sched)
+        score = calc_scoring(sched)
 
-    scorelist.append((score, m))
+        scorelist.append((score, m))
+else:
+    pass
 
 def sortlist_cmp(x, y):
     # Project out the score, from the match
