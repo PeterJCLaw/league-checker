@@ -7,7 +7,7 @@ import argparse
 
 ap = argparse.ArgumentParser(description="Identify teams that can be swapped between games inside matches")
 ap.add_argument("infile", help="Input schedule")
-ap.add_argument("matchno", help="Which match number to fiddle with")
+ap.add_argument("matchno", type=int, help="Which match number to fiddle with")
 ap.add_argument("--auto-alter", action="store_true", help="Print the schedule with specified match patched")
 
 args = ap.parse_args()
