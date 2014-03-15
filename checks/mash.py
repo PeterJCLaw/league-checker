@@ -44,16 +44,27 @@ def calc_faced_in_match(match, container):
 # Calculate how many times each team faces each other, except in the selected
 # match
 cur_match_no = 0
+forward_matches = []
+middle_idx = 0
 for match in matches:
     if cur_match_no == args.matchno:
         cur_match_no += 1
         continue
     elif args.multimatch and cur_match_no == args.matchno + 1:
+        # Store earlier matches for checking closeness criteria
+        middle_idx = cur_match_no - 1
+        firstidx = max(0, middle_idx - args.closeness)
+        print "firstidx " + str(firstidx)
+        forward_matches = matches[firstidx:middle_idx]
+
         cur_match_no += 1
         continue
 
     calc_faced_in_match(match, c)
     cur_match_no += 1
+
+num_after_matches = min(middle_idx + args.closeness, len(matches))
+after_matches = matches[middle_idx:num_after_matches]
 
 all_teams = set(c.keys())
 
