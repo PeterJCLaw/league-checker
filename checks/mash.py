@@ -216,8 +216,6 @@ if args.multimatch:
 
         match_pairs.add(comb)
 
-print "lolwat"
-
 # Now for some actual scoring. For each match, duplicate the scoring dictionary
 # for the rest of the schedule, and add the generated match to that scoring.
 
