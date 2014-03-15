@@ -161,15 +161,20 @@ for comb in product(unique_games, repeat=2):
 
 # Now for some actual scoring. For each match, duplicate the scoring dictionary
 # for the rest of the schedule, and add the generated match to that scoring.
-scorelist = []
-for m in unique_matches:
+
+def add_generated_match_sched(m, sched):
     g1, g2 = m
     g1p1, g1p2, g1p3, g1p4 = g1
     g2p1, g2p2, g2p3, g2p4 = g2
 
-    sched = copy.deepcopy(c)
     calc_faced_in_match([g1p1, g1p2, g1p3, g1p4], sched)
     calc_faced_in_match([g2p1, g2p2, g2p3, g2p4], sched)
+    return sched
+
+scorelist = []
+for m in unique_matches:
+    sched = copy.deepcopy(c)
+    sched = add_generated_match_sched(m, sched)
     score = calc_scoring(sched)
 
     scorelist.append((score, m))
