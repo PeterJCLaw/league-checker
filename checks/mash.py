@@ -110,3 +110,13 @@ for comb in product(the_match, repeat=4):
     astuple = (comb[0], comb[1], comb[2], comb[3])
     if astuple not in unique_games:
         unique_games.add(astuple)
+
+# Combine the set of unique games into a set of matches. Guard against the same
+# match but in a different order being found.
+unique_matches = set()
+for comb in product(unique_games, repeat=2):
+    g1 = comb[0]
+    g2 = comb[1]
+    if (g2, g1) in unique_matches:
+        continue
+    unique_matches.add((g1, g2))
