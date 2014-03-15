@@ -51,3 +51,34 @@ def calc_scoring(c):
             output[times] += 1
 
     return output
+
+def scoring_cmp(x, y):
+    xkeys = x.keys()
+    ykeys = y.keys()
+
+    if xkeys != ykeys:
+        # One of these dicts has a higher count of repeats than the other.
+        xkeys = sorted(xkeys, reverse=True)
+        ykeys = sorted(ykeys, reverse=True)
+
+        highest = 0
+        if xkeys[0] > ykeys[0]:
+            highest = xkeys[0]
+        else:
+            highest = ykeys[0]
+
+        for i in reversed(range(highest)):
+            if i in xkeys and i not in ykeys:
+                return 1
+            elif i in ykeys and i not in xkeys:
+                return -1
+        return 0
+    else:
+        # They have the same set of keys.
+        xkeys = sorted(xkeys, reverse=True)
+        for i in xkeys:
+            if x[i] < y[i]:
+                return -1
+            elif x[i] > y[i]:
+                return 1
+        return 0
