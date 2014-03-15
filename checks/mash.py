@@ -47,7 +47,7 @@ for match in matches:
     if cur_match_no == args.matchno:
         cur_match_no += 1
         continue
-    elif args.multimatch and cur_match_no == args.matchno + 1
+    elif args.multimatch and cur_match_no == args.matchno + 1:
         cur_match_no += 1
         continue
 
