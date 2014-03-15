@@ -237,8 +237,6 @@ def add_generated_match_sched(m, sched):
     calc_faced_in_match(list(g2), sched)
     return sched
 
-print "num of match pairs " + str(len(match_pairs))
-
 scorelist = []
 overall_score = calc_scoring(c)
 if not args.multimatch:
@@ -266,7 +264,6 @@ def sortlist_cmp(x, y):
     ys, ym = y
     return scoring_cmp(xs, ys)
 
-print "lolsorting"
 scorelist = [min(scorelist, key=cmp_to_key(sortlist_cmp))]
 
 class bcolours:
@@ -325,11 +322,20 @@ for line in lines:
     if cur_match_no == args.matchno:
         # Replace it. Pick the optimal ordering, which is the last in the list
         bestscore, bestmatch = scorelist[-1]
-        g1, g2 = bestmatch
-        plist = list(g1)
-        plist += list(g2)
-        normalised = "|".join(plist)
-        print normalised
+
+        if not args.multimatch:
+            g1, g2 = bestmatch
+            plist = list(g1)
+            plist += list(g2)
+            print "|".join(plist)
+        else:
+            (g1, g2), (g3, g4) = bestmatch
+            plist = list(g1)
+            plist += list(g2)
+            print "|".join(plist)
+            plist = list(g3)
+            plist += list(g4)
+            print "|".join(plist)
     else:
         # Just print it
         print line
