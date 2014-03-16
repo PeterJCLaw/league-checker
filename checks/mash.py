@@ -217,13 +217,13 @@ if args.multimatch:
             continue
 
         # That's checked uniqueness. Now look for closeness hazards.
-	if len(set3 & after_teams) != 0:
+        if len(set3 & after_teams) != 0:
             continue
-	if len(set4 & after_teams) != 0:
+        if len(set4 & after_teams) != 0:
             continue
-	if len(set1 & forward_teams) != 0:
+        if len(set1 & forward_teams) != 0:
             continue
-	if len(set2 & forward_teams) != 0:
+        if len(set2 & forward_teams) != 0:
             continue
 
         match_pairs.add(comb)
