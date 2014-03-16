@@ -101,6 +101,9 @@ def calc_scoring(sched):
         faced = opponents.keys()
         for opp in faced:
             times = opponents[opp]
+            if times == 0:
+                continue
+
             output[times] += 1
 
     # Remove repeats with zero count
