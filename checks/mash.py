@@ -66,8 +66,8 @@ for match in matches:
     calc_faced_in_match(match, c)
     cur_match_no += 1
 
-num_after_matches = min(middle_idx + args.closeness, len(matches))
-after_matches = matches[middle_idx:num_after_matches]
+num_after_matches = min(middle_idx + 2 + args.closeness, len(matches))
+after_matches = matches[middle_idx+2:num_after_matches]
 
 # Calculate the teams who'll conflict with players in our matches in multimatch
 # mode
