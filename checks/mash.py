@@ -75,10 +75,12 @@ after_matches = matches[middle_idx+2:num_after_matches]
 forward_teams = []
 for match in forward_matches:
     forward_teams += match
+forward_teams = frozenset(forward_teams)
 
 after_teams = []
 for match in after_teams:
     after_teams += match
+after_teams = frozenset(after_teams)
 
 all_teams = set(c.keys())
 
@@ -220,13 +222,13 @@ if args.multimatch:
             continue
 
         # That's checked uniqueness. Now look for closeness hazards.
-        if x in set1 in after_teams:
+	if len(set3 & after_teams) != 0:
             continue
-        if x in set2 in after_teams:
+	if len(set4 & after_teams) != 0:
             continue
-        if x in set3 in forward_teams:
+	if len(set1 & forward_teams) != 0:
             continue
-        if x in set4 in forward_teams:
+	if len(set2 & forward_teams) != 0:
             continue
 
         match_pairs.add(comb)
