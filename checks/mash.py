@@ -242,7 +242,6 @@ if not args.multimatch:
         sched = add_generated_match_sched(m, sched, False)
         score = calc_scoring(sched)
 
-        print >>sys.stderr, "lala"
         scorelist.append((score, m))
 else:
     for m in match_pairs:
