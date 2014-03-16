@@ -34,16 +34,19 @@ for line in lines:
 
 c = collections.defaultdict(collections.Counter)
 
-def calc_faced_in_game(game, container):
+def calc_faced_in_game(game, container, sub):
     for tla in game:
         for faces in game:
-            container[tla][faces] += 1
+            if sub:
+                container[tla][faces] -= 1
+            else:
+                container[tla][faces] += 1
 
-def calc_faced_in_match(match, container):
+def calc_faced_in_match(match, container, sub=False):
     while len(match) > 4:
-        calc_faced_in_game(match[0:4], container)
+        calc_faced_in_game(match[0:4], container, sub)
         match = match[4:]
-    calc_faced_in_game(match, container)
+    calc_faced_in_game(match, container, sub)
 
 # Calculate how many times each team faces each other, except in the selected
 # match
@@ -106,17 +109,6 @@ def calc_scoring(sched):
             del output[i]
 
     return output
-
-def merge_scores(sched1, sched2):
-    merged = dict()
-    common = set(sched1.keys()) & set(sched2.keys())
-    merged.update(sched1)
-    merged.update(sched2)
-
-    for key in common:
-        merged[key] = sched1[key] + sched2[key]
-
-    return merged
 
 # Define a comparator about the score a particular match configuration has.
 # A 'better' score is one where the largest magnitude of repeat is less than
@@ -236,31 +228,33 @@ if args.multimatch:
 # Now for some actual scoring. For each match, duplicate the scoring dictionary
 # for the rest of the schedule, and add the generated match to that scoring.
 
-def add_generated_match_sched(m, sched):
+def add_generated_match_sched(m, sched, sub):
     g1, g2 = m
 
-    calc_faced_in_match(list(g1), sched)
-    calc_faced_in_match(list(g2), sched)
+    calc_faced_in_match(list(g1), sched, sub)
+    calc_faced_in_match(list(g2), sched, sub)
     return sched
 
 scorelist = []
-overall_score = calc_scoring(c)
 if not args.multimatch:
     for m in unique_matches:
-        sched = collections.defaultdict(collections.Counter)
-        sched = add_generated_match_sched(m, sched)
+        sched = c
+        sched = add_generated_match_sched(m, sched, False)
         score = calc_scoring(sched)
-        score = merge_scores(score, overall_score)
 
+        print >>sys.stderr, "lala"
         scorelist.append((score, m))
 else:
     for m in match_pairs:
         m1, m2 = m
-        sched = collections.defaultdict(collections.Counter)
-        sched = add_generated_match_sched(m1, sched)
-        sched = add_generated_match_sched(m2, sched)
+        sched = c
+        sched = add_generated_match_sched(m1, sched, False)
+        sched = add_generated_match_sched(m2, sched, False)
         score = calc_scoring(sched)
-        score = merge_scores(score, overall_score)
+
+        sched = add_generated_match_sched(m1, sched, True)
+        sched = add_generated_match_sched(m2, sched, True)
+        c = sched
 
         scorelist.append((score, m))
 
