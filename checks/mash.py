@@ -244,6 +244,7 @@ if not args.multimatch:
         sched = c
         sched = add_generated_match_sched(m, sched, False)
         score = calc_scoring(sched)
+        sched = add_generated_match_sched(m, sched, True)
 
         scorelist.append((score, m))
 else:
