@@ -78,7 +78,7 @@ for match in forward_matches:
 forward_teams = frozenset(forward_teams)
 
 after_teams = []
-for match in after_teams:
+for match in after_matches:
     after_teams += match
 after_teams = frozenset(after_teams)
 
