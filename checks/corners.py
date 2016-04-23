@@ -46,7 +46,7 @@ def chunk(lst, size=4):
 
 def load_schedule(file_path):
     schedule = []
-    with open(args.schedule_file, 'r') as f:
+    with open(file_path, 'r') as f:
         for l in f.readlines():
             text = l.split(COMMENT_CHAR, 1)[0].strip()
             if text:
