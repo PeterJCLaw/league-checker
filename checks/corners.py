@@ -74,7 +74,9 @@ def convert(schedule, teams_to_ignore):
 def analyse(teams):
     infos = []
     for team_id, corner_counts in teams.items():
-        std_dev = standard_deviation(corner_counts.values())
+        counts = corner_counts.values()
+        counts += [0] * (4 - len(counts))
+        std_dev = standard_deviation(counts)
         infos.append( (std_dev, team_id, corner_counts) )
 
     infos.sort(reverse=True)
