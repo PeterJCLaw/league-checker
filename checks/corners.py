@@ -9,10 +9,7 @@ import math
 import random
 import sys
 
-
-COMMENT_CHAR = '#'
-SEPARATOR = '|'
-
+import helpers
 
 def mean(numbers):
     assert numbers
@@ -46,16 +43,13 @@ def chunk(lst, size=4):
 
 def load_schedule(file_path):
     schedule = []
-    with open(file_path, 'r') as f:
-        for l in f.readlines():
-            text = l.split(COMMENT_CHAR, 1)[0].strip()
-            if text:
-                teams = text.split(SEPARATOR)
-                assert len(teams) % 4 == 0
+    for line in helpers.load_lines(file_path):
+        teams = line.split(helpers.SEPARATOR)
+        assert len(teams) % 4 == 0
 
-                teams = map(int, teams)
-                matches = chunk(teams, 4)
-                schedule.append(matches)
+        teams = map(int, teams)
+        matches = chunk(teams, 4)
+        schedule.append(matches)
 
     return schedule
 

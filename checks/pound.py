@@ -2,6 +2,8 @@
 import collections
 import sys
 
+import helpers
+
 if __name__ == "__main__":
 
     if len(sys.argv) != 2 or '--help' in sys.argv:
@@ -9,11 +11,11 @@ if __name__ == "__main__":
         print '  Prints the number of matches each team has, sorted by match count'
         exit(1)
 
-    f = open(sys.argv[1]).read().strip().split("\n")
+    lines = helpers.load_lines(sys.argv[1])
 
     c = collections.Counter()
 
-    for match in f:
+    for match in lines:
         teams = match.split("|")
         for team in teams:
             c[team] += 1

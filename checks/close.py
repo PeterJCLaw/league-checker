@@ -2,6 +2,8 @@
 from collections import defaultdict, Counter
 import sys
 
+import helpers
+
 if len(sys.argv) != 2 or '--help' in sys.argv:
     print 'Usage: close.py <schedule-file>'
     print '  Displays statistics about how close the matches for all teams are.'
@@ -9,7 +11,7 @@ if len(sys.argv) != 2 or '--help' in sys.argv:
     print '  match intervals off, and then another match.'
     exit(1)
 
-lines = open(sys.argv[1], 'r').readlines()
+lines = helpers.load_lines(sys.argv[1])
 
 matches = defaultdict(lambda: [])
 breaks = defaultdict(lambda: [])
@@ -17,13 +19,7 @@ breaks = defaultdict(lambda: [])
 match_num = 1
 
 for line in lines:
-    if line.strip() == "":
-        continue
-
-    if len(line) > 0 and line[0] == '#':
-        continue
-
-    teams = line.strip().split('|')
+    teams = line.split('|')
     for tla in teams:
         matches[tla].append(int(match_num))
 

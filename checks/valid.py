@@ -1,6 +1,8 @@
 
 import sys
 
+import helpers
+
 if len(sys.argv) != 3 or '--help' in sys.argv:
     print 'Usage: valid.py <schedule-file> <teams-file>'
     print '  Ensures that all the teams listed (one TLA per line) are in the schedule'
@@ -8,18 +10,12 @@ if len(sys.argv) != 3 or '--help' in sys.argv:
 
 all_teams = [x.strip() for x in open(sys.argv[2], 'r').readlines()]
 
-lines = open(sys.argv[1], 'r').readlines()
+lines = helpers.load_lines(sys.argv[1])
 
 found_teams = []
 
 for line in lines:
-    line = line.strip()
-    if len(line) > 0 and line[0] == '#':
-        continue
-
-    if len(line) == 0:
-        continue
-    teams = [x.strip() for x in line.strip().split('|')]
+    teams = [x.strip() for x in line.split('|')]
     #print line
     assert len(set(teams)) == len(teams) == 4, teams
     found_teams += teams

@@ -2,6 +2,8 @@
 import collections
 import sys
 
+import helpers
+
 VERBOSE = False
 
 if len(sys.argv) != 2 or '--help' in sys.argv:
@@ -10,11 +12,8 @@ if len(sys.argv) != 2 or '--help' in sys.argv:
     exit(1)
 
 matches = []
-lines = [x.strip() for x in open(sys.argv[1])]
+lines = helpers.load_lines(sys.argv[1])
 for line in lines:
-    if len(line) > 0 and line[0] == '#':
-        continue
-
     players = line.split('|')
     while len(players) > 4:
         matches.append(players[0:4])
