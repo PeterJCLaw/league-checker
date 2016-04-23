@@ -4,7 +4,9 @@ from __future__ import print_function
 
 import argparse
 from collections import defaultdict, Counter
+from itertools import chain
 import math
+import random
 import sys
 
 
@@ -57,7 +59,7 @@ def load_schedule(file_path):
 
     return schedule
 
-def convert(schedule, teams_to_ignore):
+def convert(schedule, teams_to_ignore=()):
     # Maps team -> corner -> count
     teams = defaultdict(Counter)
 
@@ -99,8 +101,22 @@ def print_info(infos):
             print(" {0}".format(count), end='')
         print('')
 
+
+def shuffle_all(schedule):
+    for matches in schedule:
+        for teams in matches:
+            random.shuffle(teams)
+
+
+def print_schedule(writer, schedule):
+    for matches in schedule:
+        teams = map(str, chain.from_iterable(matches))
+        print(SEPARATOR.join(teams), file=writer)
+
+
 parser = argparse.ArgumentParser('Displays statistics about how often a team is in a given corner')
 parser.add_argument('-i', '--ignore-ids', help='comma separated list of ids to ignore')
+parser.add_argument('--fix', help='randomise corner assignment within each match and output a new schedule to the given file')
 parser.add_argument('schedule_file', help='schedule to examine')
 
 args = parser.parse_args()
@@ -110,7 +126,17 @@ args = parser.parse_args()
 ignores = map(int, args.ignore_ids.split(',')) if args.ignore_ids else []
 
 schedule = load_schedule(args.schedule_file)
+assert schedule, "Schedule file was empty!"
+
 teams = convert(schedule, ignores)
 
 infos = analyse(teams)
 print_info(infos)
+
+if not args.fix:
+    exit()
+
+shuffle_all(schedule)
+
+with open(args.fix, 'w') as f:
+    print_schedule(f, schedule)
