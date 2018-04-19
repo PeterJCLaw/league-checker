@@ -47,7 +47,6 @@ def load_schedule(file_path):
         teams = line.split(helpers.SEPARATOR)
         assert len(teams) % 4 == 0
 
-        teams = map(int, teams)
         matches = chunk(teams, 4)
         schedule.append(matches)
 
