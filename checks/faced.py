@@ -1,18 +1,17 @@
-
+import argparse
 import collections
 import sys
 
 import helpers
 
-VERBOSE = False
+parser = argparse.ArgumentParser("Displays statistics about which others a team have faced")
+parser.add_argument('--verbose', action='store_true', default=False)
+parser.add_argument('schedule_file', help='schedule to examine')
 
-if len(sys.argv) != 2 or '--help' in sys.argv:
-    print 'Usage: faced.py <schedule-file>'
-    print '  Displays statistics about which others a team have faced'
-    exit(1)
+args = parser.parse_args()
 
 matches = []
-lines = helpers.load_lines(sys.argv[1])
+lines = helpers.load_lines(args.schedule_file)
 for line in lines:
     players = line.split('|')
     while len(players) > 4:
@@ -48,7 +47,7 @@ for tla, opponents in c.iteritems():
             all_repeats[opp] = times
         if times > LOTS_REPEATS_LIMIT:
             lots_repeats[opp] = times
-    if VERBOSE:
+    if args.verbose:
         print '{0} faces {1} opponents: {2}'.format(tla, len(faced), faced)
         print '{0} repeats {1} opponents: {2}'.format(tla, len(all_repeats), all_repeats)
         print '{0} repeats {1} opponents lots of times: {2}'.format(tla, len(lots_repeats), lots_repeats)
