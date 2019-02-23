@@ -21,8 +21,10 @@ for line in lines:
     assert len(players) == 4, "Only matches of size 4 are currently supported"
     matches.append(set(players))
 
-for idx, match in enumerate(matches):
-    for other_idx, other_match in enumerate(matches[idx + 1:]):
+match_enumeration = tuple(enumerate(matches))
+
+for idx, match in match_enumeration:
+    for other_idx, other_match in match_enumeration[idx + 1:]:
         overlap = match & other_match
         if len(overlap) == 4:
             print("Match {} is identical to match {}: both contain {}".format(
