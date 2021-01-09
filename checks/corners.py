@@ -31,7 +31,7 @@ def standard_deviation(numbers):
     return math.sqrt(variance(numbers))
 
 
-def chunk(lst, size=4):
+def chunk(lst, size):
     assert len(lst) % size == 0
     chunks = []
     for lower in range(0, len(lst), size):
@@ -41,13 +41,13 @@ def chunk(lst, size=4):
     return chunks
 
 
-def load_schedule(file_path):
+def load_schedule(file_path, num_corners):
     schedule = []
     for line in helpers.load_lines(file_path):
         teams = line.split(helpers.SEPARATOR)
-        assert len(teams) % 4 == 0
+        assert len(teams) % num_corners == 0
 
-        matches = chunk(teams, 4)
+        matches = chunk(teams, num_corners)
         schedule.append(matches)
 
     return schedule
@@ -66,11 +66,11 @@ def convert(schedule, teams_to_ignore=()):
 
     return teams
 
-def analyse(teams):
+def analyse(teams, num_corners):
     infos = []
     for team_id, corner_counts in teams.items():
         counts = corner_counts.values()
-        counts += [0] * (4 - len(counts))
+        counts += [0] * (num_corners - len(counts))
         std_dev = standard_deviation(counts)
         infos.append( (std_dev, team_id, corner_counts) )
 
@@ -109,6 +109,7 @@ def print_schedule(writer, schedule):
 
 parser = argparse.ArgumentParser('Displays statistics about how often a team is in a given corner')
 parser.add_argument('-i', '--ignore-ids', help='comma separated list of ids to ignore')
+parser.add_argument('--num-corners', type=int, help='the number of zones in the arena', default=4)
 parser.add_argument('--fix', help='randomise corner assignment within each match and output a new schedule to the given file')
 parser.add_argument('schedule_file', help='schedule to examine')
 
@@ -118,12 +119,12 @@ args = parser.parse_args()
 
 ignores = map(int, args.ignore_ids.split(',')) if args.ignore_ids else []
 
-schedule = load_schedule(args.schedule_file)
+schedule = load_schedule(args.schedule_file, args.num_corners)
 assert schedule, "Schedule file was empty!"
 
 teams = convert(schedule, ignores)
 
-infos = analyse(teams)
+infos = analyse(teams, args.num_corners)
 print_info(infos)
 
 if not args.fix:
