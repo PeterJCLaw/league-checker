@@ -104,7 +104,7 @@ def shuffle_all(schedule):
 def print_schedule(writer, schedule):
     for matches in schedule:
         teams = map(str, chain.from_iterable(matches))
-        print(SEPARATOR.join(teams), file=writer)
+        print(helpers.SEPARATOR.join(teams), file=writer)
 
 
 parser = argparse.ArgumentParser('Displays statistics about how often a team is in a given corner')
