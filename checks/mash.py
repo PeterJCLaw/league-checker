@@ -332,7 +332,7 @@ else:
         sched = add_generated_match_sched(m2, sched, True)
         facing_counts = sched
 
-        scorelist.append((score, (m1, m2)))
+        scorelist.append((score, (m1, m2)))  # type: ignore[arg-type]
 
 
 def sortlist_cmp(x, y):
@@ -402,7 +402,7 @@ for line in lines:
             plist += list(g2)
             print("|".join(plist))
         else:
-            (g1, g2), (g3, g4) = bestmatch
+            (g1, g2), (g3, g4) = bestmatch  # type: ignore[assignment]
             plist = list(g1)
             plist += list(g2)
             print("|".join(plist))
