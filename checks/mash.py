@@ -4,7 +4,17 @@ import sys
 import argparse
 import itertools
 import collections
-from typing import Set, Tuple, Counter, Iterable, FrozenSet, DefaultDict
+from typing import (
+    Set,
+    Tuple,
+    Counter,
+    Mapping,
+    Iterable,
+    Sequence,
+    FrozenSet,
+    Collection,
+    DefaultDict,
+)
 from functools import cmp_to_key
 
 import helpers
@@ -67,7 +77,11 @@ matches = [
 facing_counts: DefaultDict[str, Counter[str]] = collections.defaultdict(collections.Counter)
 
 
-def calc_faced_in_game(game, container, sub):
+def calc_faced_in_game(
+    game: Collection[str],
+    container: DefaultDict[str, Counter[str]],
+    sub: bool,
+) -> None:
     for tla in game:
         for faces in game:
             if sub:
@@ -76,7 +90,11 @@ def calc_faced_in_game(game, container, sub):
                 container[tla][faces] += 1
 
 
-def calc_faced_in_match(match, container, sub=False):
+def calc_faced_in_match(
+    match: Sequence[str],
+    container: DefaultDict[str, Counter[str]],
+    sub: bool = False,
+) -> None:
     while len(match) > 4:
         calc_faced_in_game(match[0:4], container, sub)
         match = match[4:]
@@ -116,7 +134,7 @@ after_teams = frozenset(itertools.chain.from_iterable(after_matches))
 all_teams = set(facing_counts.keys())
 
 
-def calc_scoring(sched):
+def calc_scoring(sched: DefaultDict[str, Counter[str]]) -> Mapping[int, int]:
     """
     Calculate a dictionary of how many times repeats happen: the size of the
     repeat maps to the number of times it happens. Due to an artifact of how
@@ -143,7 +161,7 @@ def calc_scoring(sched):
     return output
 
 
-def scoring_cmp(x, y):
+def scoring_cmp(x: Mapping[int, int], y: Mapping[int, int]) -> int:
     """
     Define a comparator about the score a particular match configuration has.
     A 'better' score is one where the largest magnitude of repeat is less than
@@ -152,8 +170,8 @@ def scoring_cmp(x, y):
     Failing that, the number of repeats is compared, in reducing magnitude, so
     a schedule with 20 3-time repeats is worse than one with 15 of them.
     """
-    xkeys = x.keys()
-    ykeys = y.keys()
+    xkeys: Collection[int] = x.keys()
+    ykeys: Collection[int] = y.keys()
 
     if xkeys != ykeys:
         # One of these dicts has a higher magnitude of repeats than the other.
@@ -282,7 +300,11 @@ if args.multimatch:
 # for the rest of the schedule, and add the generated match to that scoring.
 
 
-def add_generated_match_sched(m, sched, sub):
+def add_generated_match_sched(
+    m: Tuple[Iterable[str], Iterable[str]],
+    sched: DefaultDict[str, Counter[str]],
+    sub: bool,
+) -> DefaultDict[str, Counter[str]]:
     g1, g2 = m
 
     calc_faced_in_match(list(g1), sched, sub)
@@ -300,8 +322,7 @@ if not args.multimatch:
 
         scorelist.append((score, m))
 else:
-    for m in match_pairs:
-        m1, m2 = m
+    for m1, m2 in match_pairs:
         sched = facing_counts
         sched = add_generated_match_sched(m1, sched, False)
         sched = add_generated_match_sched(m2, sched, False)
@@ -311,7 +332,7 @@ else:
         sched = add_generated_match_sched(m2, sched, True)
         facing_counts = sched
 
-        scorelist.append((score, m))
+        scorelist.append((score, (m1, m2)))
 
 
 def sortlist_cmp(x, y):
@@ -335,22 +356,16 @@ class bcolours:
 
 if not args.auto_alter:
     if not args.multimatch:
-        for m in scorelist:
-            score, match = m
-
-            g1, g2 = match
+        for score, (g1, g2) in scorelist:
             plist = list(g1)
             plist += list(g2)
             normalised = "|".join(plist)
 
-            print("Match " + bcolours.OKGREEN + repr(match) + bcolours.ENDC)
+            print("Match " + bcolours.OKGREEN + repr((g1, g2)) + bcolours.ENDC)
             print("  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC)
             print("  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC)
     else:
-        for m in scorelist:
-            score, match = m
-
-            match1, match2 = match
+        for score, (match1, match2) in scorelist:
             m1g1, m1g2 = match1
             m2g1, m2g2 = match2
             plist = list(m1g1)
