@@ -18,6 +18,8 @@ setup(
     author="Peter Law",
     author_email="PeterJCLaw@gmail.com",
 
+    packages=['checks'],
+
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
