@@ -99,9 +99,7 @@ def calc_scoring(sched):
     this is counted, the "number of times" is twice as large as reality
     """
     # Something involving defaults would be better, but requires thought
-    output = dict()
-    for i in range(len(matches)):
-        output[i] = 0
+    output = dict.fromkeys(range(len(matches)), 0)
 
     for tla, opponents in sched.items():
         del opponents[tla]

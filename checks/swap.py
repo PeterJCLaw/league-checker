@@ -1,4 +1,3 @@
-
 import sys
 
 if len(sys.argv) != 2 or '--help' in sys.argv:
@@ -19,7 +18,7 @@ with open(sys.argv[1], 'w+') as f:
 
         find = sys.argv[2].upper()
         repl = sys.argv[3].upper()
-        if find in parts and not repl in parts:
+        if find in parts and repl not in parts:
             print(parts)
             idx = parts.index(find)
             parts[idx] = repl
