@@ -2,9 +2,22 @@
 
 import sys
 import argparse
+import itertools
 import collections
+from typing import (
+    Set,
+    Tuple,
+    Counter,
+    Mapping,
+    Iterable,
+    Sequence,
+    FrozenSet,
+    Collection,
+    DefaultDict,
+)
 from functools import cmp_to_key
-from itertools import product
+
+import helpers
 
 ap = argparse.ArgumentParser(
     description="Identify teams that can be swapped between games inside matches",
@@ -51,19 +64,24 @@ if args.multimatch and ((args.matchno + 1) % args.matches) == 0:
     print("Can't multi-match schedule over round boundaries, skipping this one", file=sys.stderr)
     args.multimatch = False
 
-matches = []
-lines = [x.strip() for x in open(args.infile)]
-for line in lines:
-    if len(line) > 0 and line[0] == '#':
-        continue
+with open(args.infile) as f:
+    lines = [x.strip() for x in f]
 
-    players = line.split('|')
-    matches.append(players)
+matches = [
+    line.split(helpers.SEPARATOR)
+    for line in lines
+    if line and line[0] != helpers.COMMENT_CHAR
+]
 
-c = collections.defaultdict(collections.Counter)
+# Map TLA -> TLA -> count
+facing_counts: DefaultDict[str, Counter[str]] = collections.defaultdict(collections.Counter)
 
 
-def calc_faced_in_game(game, container, sub):
+def calc_faced_in_game(
+    game: Collection[str],
+    container: DefaultDict[str, Counter[str]],
+    sub: bool,
+) -> None:
     for tla in game:
         for faces in game:
             if sub:
@@ -72,7 +90,11 @@ def calc_faced_in_game(game, container, sub):
                 container[tla][faces] += 1
 
 
-def calc_faced_in_match(match, container, sub=False):
+def calc_faced_in_match(
+    match: Sequence[str],
+    container: DefaultDict[str, Counter[str]],
+    sub: bool = False,
+) -> None:
     while len(match) > 4:
         calc_faced_in_game(match[0:4], container, sub)
         match = match[4:]
@@ -97,7 +119,7 @@ for match in matches:
         cur_match_no += 1
         continue
 
-    calc_faced_in_match(match, c)
+    calc_faced_in_match(match, facing_counts)
     cur_match_no += 1
 
 num_after_matches = min(middle_idx + 2 + args.closeness, len(matches))
@@ -106,20 +128,13 @@ after_matches = matches[middle_idx + 2:num_after_matches]
 # Calculate the teams who'll conflict with players in our matches in multimatch
 # mode
 
-forward_teams = []
-for match in forward_matches:
-    forward_teams += match
-forward_teams = frozenset(forward_teams)
+forward_teams = frozenset(itertools.chain.from_iterable(forward_matches))
+after_teams = frozenset(itertools.chain.from_iterable(after_matches))
 
-after_teams = []
-for match in after_matches:
-    after_teams += match
-after_teams = frozenset(after_teams)
-
-all_teams = set(c.keys())
+all_teams = set(facing_counts.keys())
 
 
-def calc_scoring(sched):
+def calc_scoring(sched: DefaultDict[str, Counter[str]]) -> Mapping[int, int]:
     """
     Calculate a dictionary of how many times repeats happen: the size of the
     repeat maps to the number of times it happens. Due to an artifact of how
@@ -146,7 +161,7 @@ def calc_scoring(sched):
     return output
 
 
-def scoring_cmp(x, y):
+def scoring_cmp(x: Mapping[int, int], y: Mapping[int, int]) -> int:
     """
     Define a comparator about the score a particular match configuration has.
     A 'better' score is one where the largest magnitude of repeat is less than
@@ -155,8 +170,8 @@ def scoring_cmp(x, y):
     Failing that, the number of repeats is compared, in reducing magnitude, so
     a schedule with 20 3-time repeats is worse than one with 15 of them.
     """
-    xkeys = x.keys()
-    ykeys = y.keys()
+    xkeys: Collection[int] = x.keys()
+    ykeys: Collection[int] = y.keys()
 
     if xkeys != ykeys:
         # One of these dicts has a higher magnitude of repeats than the other.
@@ -193,58 +208,76 @@ def scoring_cmp(x, y):
 # Select the desired match
 the_teams = matches[int(args.matchno)]
 first_match = frozenset(the_teams)
-second_match = set(the_teams)
 if args.multimatch:
     the_teams = the_teams + matches[args.matchno + 1]
-    second_match = frozenset(matches[args.matchno + 1])
 
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
 
-unique_games = set()
 
-# Generate all possible 4-team combinations via generating all combinations,
-# and canonicalising the order to avoid equivalent orderings being inserted.
-for comb in product(the_teams, repeat=4):
-    # Duplicate members?
-    theset = frozenset(comb)
-    if len(theset) != 4:
-        continue
+def get_unique_games(teams: Iterable[str]) -> Set[FrozenSet[str]]:
+    """
+    Generate all possible 4-team combinations via generating all combinations,
+    and canonicalising the order to avoid equivalent orderings being inserted.
+    """
+    unique_games = set()
 
-    if theset not in unique_games:
-        unique_games.add(theset)
-
-# Combine the set of unique games into a set of matches. Guard against the same
-# match but in a different order being found.
-unique_matches = set()
-for comb in product(unique_games, repeat=2):
-    # Test that we actually have all 8 players playing in this match.
-    if not comb[0].isdisjoint(comb[1]):
-        continue
-
-    g1 = comb[0]
-    g2 = comb[1]
-
-    # In multimatch mode, check that the match is either a completely unchanged
-    # set of teams from either match, or only has one team difference. This
-    # means we only explore one pair of teams swapping matches, keeping the size
-    # of exploration feasible.
-    if args.multimatch:
-        both = g1 | g2
-        inter_first = both & first_match
-
-        thelen = len(inter_first)
-        if thelen != 0 and thelen != 1 and thelen != 7 and thelen != 8:
+    for comb in itertools.product(the_teams, repeat=4):
+        # Duplicate members?
+        theset = frozenset(comb)
+        if len(theset) != 4:
             continue
 
-    if (g2, g1) in unique_matches:
-        continue
-    unique_matches.add((g1, g2))
+        if theset not in unique_games:
+            unique_games.add(theset)
+
+    return unique_games
+
+
+unique_games = get_unique_games(the_teams)
+
+
+def get_unique_matches(
+    unique_games: Set[FrozenSet[str]],
+    multimatch: bool,
+) -> Set[Tuple[FrozenSet[str], FrozenSet[str]]]:
+    """
+    Combine the set of unique games into a set of matches. Guard against the same
+    match but in a different order being found.
+    """
+
+    unique_matches = set()
+    for g1, g2 in itertools.product(unique_games, repeat=2):
+        # Test that we actually have all 8 players playing in this match.
+        if not g1.isdisjoint(g2):
+            continue
+
+        # In multimatch mode, check that the match is either a completely unchanged
+        # set of teams from either match, or only has one team difference. This
+        # means we only explore one pair of teams swapping matches, keeping the size
+        # of exploration feasible.
+        if multimatch:
+            both = g1 | g2
+            inter_first = both & first_match
+
+            thelen = len(inter_first)
+            if thelen != 0 and thelen != 1 and thelen != 7 and thelen != 8:
+                continue
+
+        if (g2, g1) in unique_matches:
+            continue
+        unique_matches.add((g1, g2))
+
+    return unique_matches
+
+
+unique_matches = get_unique_matches(unique_games, args.multimatch)
+
 
 # In multimatch mode, turn the unique matches set into a set of match pairs.
 match_pairs = set()
 if args.multimatch:
-    for comb in product(unique_matches, repeat=2):
+    for comb in itertools.product(unique_matches, repeat=2):
         m1, m2 = comb
         set1, set2 = m1
         set3, set4 = m2
@@ -267,7 +300,11 @@ if args.multimatch:
 # for the rest of the schedule, and add the generated match to that scoring.
 
 
-def add_generated_match_sched(m, sched, sub):
+def add_generated_match_sched(
+    m: Tuple[Iterable[str], Iterable[str]],
+    sched: DefaultDict[str, Counter[str]],
+    sub: bool,
+) -> DefaultDict[str, Counter[str]]:
     g1, g2 = m
 
     calc_faced_in_match(list(g1), sched, sub)
@@ -278,32 +315,31 @@ def add_generated_match_sched(m, sched, sub):
 scorelist = []
 if not args.multimatch:
     for m in unique_matches:
-        sched = c
+        sched = facing_counts
         sched = add_generated_match_sched(m, sched, False)
         score = calc_scoring(sched)
         sched = add_generated_match_sched(m, sched, True)
 
         scorelist.append((score, m))
 else:
-    for m in match_pairs:
-        m1, m2 = m
-        sched = c
+    for m1, m2 in match_pairs:
+        sched = facing_counts
         sched = add_generated_match_sched(m1, sched, False)
         sched = add_generated_match_sched(m2, sched, False)
         score = calc_scoring(sched)
 
         sched = add_generated_match_sched(m1, sched, True)
         sched = add_generated_match_sched(m2, sched, True)
-        c = sched
+        facing_counts = sched
 
-        scorelist.append((score, m))
+        scorelist.append((score, (m1, m2)))  # type: ignore[arg-type]
 
 
 def sortlist_cmp(x, y):
     # Project out the score, from the match
-    xs, xm = x
-    ys, ym = y
-    return scoring_cmp(xs, ys)
+    x_score, x_match = x
+    y_score, y_match = y
+    return scoring_cmp(x_score, y_score)
 
 
 scorelist = [max(scorelist, key=cmp_to_key(sortlist_cmp))]
@@ -320,22 +356,16 @@ class bcolours:
 
 if not args.auto_alter:
     if not args.multimatch:
-        for m in scorelist:
-            score, match = m
-
-            g1, g2 = match
+        for score, (g1, g2) in scorelist:
             plist = list(g1)
             plist += list(g2)
             normalised = "|".join(plist)
 
-            print("Match " + bcolours.OKGREEN + repr(match) + bcolours.ENDC)
+            print("Match " + bcolours.OKGREEN + repr((g1, g2)) + bcolours.ENDC)
             print("  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC)
             print("  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC)
     else:
-        for m in scorelist:
-            score, match = m
-
-            match1, match2 = match
+        for score, (match1, match2) in scorelist:
             m1g1, m1g2 = match1
             m2g1, m2g2 = match2
             plist = list(m1g1)
@@ -372,7 +402,7 @@ for line in lines:
             plist += list(g2)
             print("|".join(plist))
         else:
-            (g1, g2), (g3, g4) = bestmatch
+            (g1, g2), (g3, g4) = bestmatch  # type: ignore[assignment]
             plist = list(g1)
             plist += list(g2)
             print("|".join(plist))
