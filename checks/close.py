@@ -7,6 +7,8 @@ from pathlib import Path
 
 import helpers
 
+WARN_MIN_GAP = 2
+
 
 def main(schedule_file: Path) -> None:
     lines = helpers.load_lines(schedule_file)
@@ -43,12 +45,12 @@ def main(schedule_file: Path) -> None:
         c: Counter[int] = collections.Counter()
         for x in sorted(btla):
             c[x] += 1
-        if min_break == 2:
+        if min_break == WARN_MIN_GAP:
             count_n += 1
         print(f"{tla}\t{min_break}\t{c[min_break]}\t{btla}")
 
     print()
-    print(count_n)
+    print(f"{count_n} teams have a minimum gap of {WARN_MIN_GAP}")
 
 
 def parse_args() -> argparse.Namespace:
