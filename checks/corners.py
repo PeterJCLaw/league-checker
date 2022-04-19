@@ -84,16 +84,16 @@ def print_info(infos):
     print(" Team |  Std. Dev. | Corner Counts")
 
     for std_dev, team_id, corner_counts in infos:
-        print("  {0:>2}  ".format(team_id), end='|')
-        print("{0:>2.3f}".format(std_dev).center(12), end='|')
+        print(f"  {team_id:>2}  ", end='|')
+        print(f"{std_dev:>2.3f}".center(12), end='|')
 
         for corner in range(4):
             count = corner_counts.get(corner)
             if count:
-                count = "{0:>2}".format(count)
+                count = f"{count:>2}"
             else:
                 count = '  '
-            print(" {0}".format(count), end='')
+            print(f" {count}", end='')
         print('')
 
 

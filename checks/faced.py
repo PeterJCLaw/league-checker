@@ -47,15 +47,19 @@ for tla, opponents in c.items():
         if times > LOTS_REPEATS_LIMIT:
             lots_repeats[opp] = times
     if args.verbose:
-        print('{0} faces {1} opponents: {2}'.format(tla, len(faced), faced))
-        print('{0} repeats {1} opponents: {2}'.format(tla, len(all_repeats), all_repeats))
-        print('{0} repeats {1} opponents lots of times: {2}'.format(tla, len(lots_repeats), lots_repeats))
-        print('{0} misses {1} opponents: {2}'.format(tla, len(missed), missed))
+        print(f"{tla} faces {len(faced)} opponents: {faced}")
+        print(f"{tla} repeats {len(all_repeats)} opponents: {all_repeats}")
+        print(f"{tla} repeats {len(lots_repeats)} opponents lots of times: {lots_repeats}")
+        print(f"{tla} misses {len(missed)} opponents: {missed}")
     else:
-        print('{0: <4} faces {1: >2}, misses {2: >2}, repeats {3: >2} more than {4} times'
-              .format(tla, len(faced), len(missed), len(lots_repeats), LOTS_REPEATS_LIMIT), end=' ')
+        print(
+            f"{tla: <4} faces {len(faced): >2}, "
+            f"misses {len(missed): >2}, "
+            f"repeats {len(lots_repeats): >2} more than {LOTS_REPEATS_LIMIT} times",
+            end="",
+        )
         if len(lots_repeats) > 1:
-            worst = lots_repeats.most_common(1)[0]
-            if worst[1] > 10:
-                print('(including {0} {1} times)'.format(*worst), end=' ')
+            worst, count = lots_repeats.most_common(1)[0]
+            if count > 10:
+                print(f" (including {worst} {count} times)", end="")
         print()

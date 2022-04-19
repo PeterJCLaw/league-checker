@@ -1,4 +1,3 @@
-
 import sys
 
 import helpers
@@ -8,7 +7,7 @@ if len(sys.argv) != 3 or '--help' in sys.argv:
     print('  Ensures that all the teams listed (one TLA per line) are in the schedule')
     exit(1)
 
-all_teams = [x.strip() for x in open(sys.argv[2], 'r').readlines()]
+all_teams = [x.strip() for x in open(sys.argv[2]).readlines()]
 
 lines = helpers.load_lines(sys.argv[1])
 
