@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+
 
 import argparse
 from collections import defaultdict, Counter
@@ -69,7 +69,7 @@ def convert(schedule, teams_to_ignore=()):
 def analyse(teams, num_corners):
     infos = []
     for team_id, corner_counts in teams.items():
-        counts = corner_counts.values()
+        counts = list(corner_counts.values())
         counts += [0] * (num_corners - len(counts))
         std_dev = standard_deviation(counts)
         infos.append( (std_dev, team_id, corner_counts) )

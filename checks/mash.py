@@ -16,11 +16,11 @@ ap.add_argument("--closeness", type=int, default=0, help="Closeness criteria")
 args = ap.parse_args()
 
 if args.multimatch and (args.matches == 0 or args.closeness == 0):
-    print >>sys.stderr, "Matches and closeness options required for doing multimatch calcs"
+    print("Matches and closeness options required for doing multimatch calcs", file=sys.stderr)
     sys.exit(1)
 
 if args.multimatch and ((args.matchno + 1) % args.matches) == 0:
-    print >>sys.stderr, "Can't multi-match schedule over round boundries, skipping this one"
+    print("Can't multi-match schedule over round boundries, skipping this one", file=sys.stderr)
     args.multimatch = False
 
 matches = []
@@ -96,7 +96,7 @@ def calc_scoring(sched):
     for i in range(len(matches)):
         output[i] = 0
 
-    for tla, opponents in sched.iteritems():
+    for tla, opponents in sched.items():
         del opponents[tla]
         faced = opponents.keys()
         for opp in faced:
@@ -107,7 +107,7 @@ def calc_scoring(sched):
             output[times] += 1
 
     # Remove repeats with zero count
-    for i in output.keys():
+    for i in list(output.keys()):
         if output[i] == 0:
             del output[i]
 
@@ -287,9 +287,9 @@ if not args.auto_alter:
             plist += list(g2)
             normalised = "|".join(plist)
 
-            print "Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC
-            print "  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC
-            print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+            print("Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC)
+            print("  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC)
+            print("  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC)
     else:
         for m in scorelist:
             score, match = m
@@ -304,11 +304,11 @@ if not args.auto_alter:
             plist += list(m2g2)
             normalised2 = "|".join(plist)
 
-            print "Match " + bcolours.OKGREEN +  repr(match1) + bcolours.ENDC
-            print "      " + bcolours.OKGREEN +  repr(match2) + bcolours.ENDC
-            print "  normalised as " + bcolours.OKBLUE + normalised1 + bcolours.ENDC
-            print "                " + bcolours.OKBLUE + normalised2 + bcolours.ENDC
-            print "  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC
+            print("Match " + bcolours.OKGREEN +  repr(match1) + bcolours.ENDC)
+            print("      " + bcolours.OKGREEN +  repr(match2) + bcolours.ENDC)
+            print("  normalised as " + bcolours.OKBLUE + normalised1 + bcolours.ENDC)
+            print("                " + bcolours.OKBLUE + normalised2 + bcolours.ENDC)
+            print("  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC)
 
 
     sys.exit(0)
@@ -319,7 +319,7 @@ if not args.auto_alter:
 cur_match_no = 0
 for line in lines:
     if len(line) > 0 and line[0] == '#':
-        print line
+        print(line)
         continue
 
     if cur_match_no == args.matchno:
@@ -330,19 +330,19 @@ for line in lines:
             g1, g2 = bestmatch
             plist = list(g1)
             plist += list(g2)
-            print "|".join(plist)
+            print("|".join(plist))
         else:
             (g1, g2), (g3, g4) = bestmatch
             plist = list(g1)
             plist += list(g2)
-            print "|".join(plist)
+            print("|".join(plist))
             plist = list(g3)
             plist += list(g4)
-            print "|".join(plist)
+            print("|".join(plist))
     elif args.multimatch and cur_match_no == args.matchno + 1:
         pass # already printed it
     else:
         # Just print it
-        print line
+        print(line)
 
     cur_match_no += 1

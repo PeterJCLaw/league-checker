@@ -2,9 +2,9 @@
 import sys
 
 if len(sys.argv) != 2 or '--help' in sys.argv:
-    print 'Usage: swap.py <schedule-file> <find-tla> <replace-tla>'
-    print '  Searches for a match that contains the first team, but not the second'
-    print '  and replaces the first for the second in that match.'
+    print('Usage: swap.py <schedule-file> <find-tla> <replace-tla>')
+    print('  Searches for a match that contains the first team, but not the second')
+    print('  and replaces the first for the second in that match.')
     exit(1)
 
 f = open(sys.argv[1])
@@ -20,10 +20,10 @@ with open(sys.argv[1], 'w+') as f:
         find = sys.argv[2].upper()
         repl = sys.argv[3].upper()
         if find in parts and not repl in parts:
-            print parts
+            print(parts)
             idx = parts.index(find)
             parts[idx] = repl
-            print parts
+            print(parts)
 
             line = '|'.join(parts)
             lines[i] = line
