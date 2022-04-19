@@ -3,6 +3,8 @@
 import math
 import random
 import argparse
+from typing import Sequence
+from pathlib import Path
 from itertools import chain
 from collections import Counter, defaultdict
 
@@ -109,37 +111,59 @@ def print_schedule(writer, schedule):
         print(helpers.SEPARATOR.join(teams), file=writer)
 
 
-parser = argparse.ArgumentParser("Displays statistics about how often a team is in a given corner")
-parser.add_argument('-i', '--ignore-ids', help="comma separated list of ids to ignore")
-parser.add_argument('--num-corners', type=int, help="the number of zones in the arena", default=4)
-parser.add_argument(
-    '--fix',
-    metavar='destination',
-    help=(
-        "randomise corner assignment within each match and output a new schedule "
-        "to the given file"
-    ),
-)
-parser.add_argument('schedule_file', help="schedule to examine")
+def main(schedule_file: Path, num_corners: int, ignore_ids: Sequence[int], fix: Path) -> None:
+    schedule = load_schedule(schedule_file, num_corners)
+    assert schedule, "Schedule file was empty!"
 
-args = parser.parse_args()
+    teams = convert(schedule, ignore_ids)
 
-# print("\n".join(lines))
+    infos = analyse(teams, num_corners)
+    print_info(infos)
 
-ignores = map(int, args.ignore_ids.split(',')) if args.ignore_ids else []
+    if not fix:
+        return
 
-schedule = load_schedule(args.schedule_file, args.num_corners)
-assert schedule, "Schedule file was empty!"
+    shuffle_all(schedule)
 
-teams = convert(schedule, ignores)
+    with open(fix, 'w') as f:
+        print_schedule(f, schedule)
 
-infos = analyse(teams, args.num_corners)
-print_info(infos)
 
-if not args.fix:
-    exit()
+def ignore_ids_type(value: str) -> Sequence[int]:
+    return [int(x) for x in value.split(',')]
 
-shuffle_all(schedule)
 
-with open(args.fix, 'w') as f:
-    print_schedule(f, schedule)
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        "Displays statistics about how often a team is in a given corner and "
+        "optionally produces a schedule with randomized corners",
+    )
+    parser.add_argument(
+        '-i',
+        '--ignore-ids',
+        type=ignore_ids_type,
+        default=(),
+        help="Comma separated list of ids to ignore.",
+    )
+    parser.add_argument(
+        '--num-corners',
+        type=int,
+        help="The number of zones in the arena (default: %(default)s).",
+        default=4,
+    )
+    parser.add_argument(
+        '--fix',
+        metavar='destination',
+        type=Path,
+        help=(
+            "Randomize corner assignment within each match and output a new schedule "
+            "to the given file."
+        ),
+    )
+    parser.add_argument('schedule_file', type=Path, help="schedule to examine")
+
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    main(**parse_args().__dict__)
