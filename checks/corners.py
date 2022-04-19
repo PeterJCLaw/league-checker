@@ -112,9 +112,14 @@ def print_schedule(writer, schedule):
 parser = argparse.ArgumentParser("Displays statistics about how often a team is in a given corner")
 parser.add_argument('-i', '--ignore-ids', help="comma separated list of ids to ignore")
 parser.add_argument('--num-corners', type=int, help="the number of zones in the arena", default=4)
-parser.add_argument('--fix', help=(
-    "randomise corner assignment within each match and output a new schedule to the given file"
-))
+parser.add_argument(
+    '--fix',
+    metavar='destination',
+    help=(
+        "randomise corner assignment within each match and output a new schedule "
+        "to the given file"
+    ),
+)
 parser.add_argument('schedule_file', help="schedule to examine")
 
 args = parser.parse_args()
