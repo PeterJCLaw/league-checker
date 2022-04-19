@@ -1,6 +1,6 @@
-
 COMMENT_CHAR = '#'
 SEPARATOR = '|'
+
 
 def load_lines(file_path):
     lines = []

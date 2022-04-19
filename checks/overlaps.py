@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import collections
-import sys
 
 import helpers
 

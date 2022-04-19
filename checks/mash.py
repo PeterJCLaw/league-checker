@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-import collections
+
 import sys
-import copy
-from functools import cmp_to_key
 import argparse
+import collections
+from functools import cmp_to_key
+from itertools import product
 
 ap = argparse.ArgumentParser(description="Identify teams that can be swapped between games inside matches")
 ap.add_argument("infile", help="Input schedule")
@@ -34,6 +35,7 @@ for line in lines:
 
 c = collections.defaultdict(collections.Counter)
 
+
 def calc_faced_in_game(game, container, sub):
     for tla in game:
         for faces in game:
@@ -42,11 +44,13 @@ def calc_faced_in_game(game, container, sub):
             else:
                 container[tla][faces] += 1
 
+
 def calc_faced_in_match(match, container, sub=False):
     while len(match) > 4:
         calc_faced_in_game(match[0:4], container, sub)
         match = match[4:]
     calc_faced_in_game(match, container, sub)
+
 
 # Calculate how many times each team faces each other, except in the selected
 # match
@@ -70,7 +74,7 @@ for match in matches:
     cur_match_no += 1
 
 num_after_matches = min(middle_idx + 2 + args.closeness, len(matches))
-after_matches = matches[middle_idx+2:num_after_matches]
+after_matches = matches[middle_idx + 2:num_after_matches]
 
 # Calculate the teams who'll conflict with players in our matches in multimatch
 # mode
@@ -87,10 +91,13 @@ after_teams = frozenset(after_teams)
 
 all_teams = set(c.keys())
 
-# Calculate a dictionary of how many times repeats happen: the size of the
-# repeat maps to the number of times it happens. Due to an artifact of how
-# this is counted, the "number of times" is twice as large as reality
+
 def calc_scoring(sched):
+    """
+    Calculate a dictionary of how many times repeats happen: the size of the
+    repeat maps to the number of times it happens. Due to an artifact of how
+    this is counted, the "number of times" is twice as large as reality
+    """
     # Something involving defaults would be better, but requires thought
     output = dict()
     for i in range(len(matches)):
@@ -113,13 +120,16 @@ def calc_scoring(sched):
 
     return output
 
-# Define a comparator about the score a particular match configuration has.
-# A 'better' score is one where the largest magnitude of repeat is less than
-# another, i.e. a schedule with some 3-times repeats is better than one with
-# any 4-time repeats.
-# Failing that, the number of repeats is compared, in reducing magnitude, so
-# a schedule with 20 3-time repeats is worse than one with 15 of them.
+
 def scoring_cmp(x, y):
+    """
+    Define a comparator about the score a particular match configuration has.
+    A 'better' score is one where the largest magnitude of repeat is less than
+    another, i.e. a schedule with some 3-times repeats is better than one with
+    any 4-time repeats.
+    Failing that, the number of repeats is compared, in reducing magnitude, so
+    a schedule with 20 3-time repeats is worse than one with 15 of them.
+    """
     xkeys = x.keys()
     ykeys = y.keys()
 
@@ -137,7 +147,7 @@ def scoring_cmp(x, y):
 
         # Decrease from there, finding where which schedule, x or y, has a
         # magnitude of repeat that the other doesn't
-        for i in reversed(range(highest+1)):
+        for i in reversed(range(highest + 1)):
             if i in xkeys and i not in ykeys:
                 return -1
             elif i in ykeys and i not in xkeys:
@@ -154,6 +164,7 @@ def scoring_cmp(x, y):
                 return -1
         return 0
 
+
 # Select the desired match
 the_teams = matches[int(args.matchno)]
 first_match = frozenset(the_teams)
@@ -169,7 +180,6 @@ unique_games = set()
 
 # Generate all possible 4-team combinations via generating all combinations,
 # and canonicalising the order to avoid equivalent orderings being inserted.
-from itertools import product
 for comb in product(the_teams, repeat=4):
     # Duplicate members?
     theset = frozenset(comb)
@@ -231,12 +241,14 @@ if args.multimatch:
 # Now for some actual scoring. For each match, duplicate the scoring dictionary
 # for the rest of the schedule, and add the generated match to that scoring.
 
+
 def add_generated_match_sched(m, sched, sub):
     g1, g2 = m
 
     calc_faced_in_match(list(g1), sched, sub)
     calc_faced_in_match(list(g2), sched, sub)
     return sched
+
 
 scorelist = []
 if not args.multimatch:
@@ -261,13 +273,16 @@ else:
 
         scorelist.append((score, m))
 
+
 def sortlist_cmp(x, y):
     # Project out the score, from the match
     xs, xm = x
     ys, ym = y
     return scoring_cmp(xs, ys)
 
+
 scorelist = [max(scorelist, key=cmp_to_key(sortlist_cmp))]
+
 
 class bcolours:
     HEADER = '\033[95m'
@@ -276,6 +291,7 @@ class bcolours:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
+
 
 if not args.auto_alter:
     if not args.multimatch:
@@ -287,7 +303,7 @@ if not args.auto_alter:
             plist += list(g2)
             normalised = "|".join(plist)
 
-            print("Match " + bcolours.OKGREEN +  repr(match) + bcolours.ENDC)
+            print("Match " + bcolours.OKGREEN + repr(match) + bcolours.ENDC)
             print("  normalised as " + bcolours.OKBLUE + normalised + bcolours.ENDC)
             print("  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC)
     else:
@@ -304,12 +320,11 @@ if not args.auto_alter:
             plist += list(m2g2)
             normalised2 = "|".join(plist)
 
-            print("Match " + bcolours.OKGREEN +  repr(match1) + bcolours.ENDC)
-            print("      " + bcolours.OKGREEN +  repr(match2) + bcolours.ENDC)
+            print("Match " + bcolours.OKGREEN + repr(match1) + bcolours.ENDC)
+            print("      " + bcolours.OKGREEN + repr(match2) + bcolours.ENDC)
             print("  normalised as " + bcolours.OKBLUE + normalised1 + bcolours.ENDC)
             print("                " + bcolours.OKBLUE + normalised2 + bcolours.ENDC)
             print("  scored: " + bcolours.FAIL + repr(score) + bcolours.ENDC)
-
 
     sys.exit(0)
 
@@ -340,7 +355,7 @@ for line in lines:
             plist += list(g4)
             print("|".join(plist))
     elif args.multimatch and cur_match_no == args.matchno + 1:
-        pass # already printed it
+        pass  # already printed it
     else:
         # Just print it
         print(line)

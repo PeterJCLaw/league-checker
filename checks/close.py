@@ -1,6 +1,6 @@
 
-from collections import defaultdict, Counter
 import sys
+from collections import Counter, defaultdict
 
 import helpers
 
@@ -41,7 +41,7 @@ for tla, matches in matches.items():
 print('Team\tMin-gap\tCount\tGaps')
 
 count_n = 0
-for tla, min_break, btla in sorted(min_breaks, key=lambda x:x[1]):
+for tla, min_break, btla in sorted(min_breaks, key=lambda x: x[1]):
     c = Counter()
     for x in sorted(btla):
         c[x] += 1

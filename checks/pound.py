@@ -1,6 +1,5 @@
-
-import collections
 import sys
+import collections
 
 import helpers
 

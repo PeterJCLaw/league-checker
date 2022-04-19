@@ -1,20 +1,19 @@
 #!/usr/bin/env python
 
-
-
-import argparse
-from collections import defaultdict, Counter
-from itertools import chain
 import math
 import random
-import sys
+import argparse
+from itertools import chain
+from collections import Counter, defaultdict
 
 import helpers
+
 
 def mean(numbers):
     assert numbers
 
     return sum(numbers) * 1.0 / len(numbers)
+
 
 def variance(numbers):
     assert numbers
@@ -24,6 +23,7 @@ def variance(numbers):
     sqaure_deviations = [(n - mean_value)**2 for n in numbers]
 
     return mean(sqaure_deviations)
+
 
 def standard_deviation(numbers):
     assert numbers
@@ -35,7 +35,7 @@ def chunk(lst, size):
     assert len(lst) % size == 0
     chunks = []
     for lower in range(0, len(lst), size):
-        chunk = lst[lower:lower+size]
+        chunk = lst[lower:lower + size]
         chunks.append(chunk)
 
     return chunks
@@ -52,6 +52,7 @@ def load_schedule(file_path, num_corners):
 
     return schedule
 
+
 def convert(schedule, teams_to_ignore=()):
     # Maps team -> corner -> count
     teams = defaultdict(Counter)
@@ -66,13 +67,14 @@ def convert(schedule, teams_to_ignore=()):
 
     return teams
 
+
 def analyse(teams, num_corners):
     infos = []
     for team_id, corner_counts in teams.items():
         counts = list(corner_counts.values())
         counts += [0] * (num_corners - len(counts))
         std_dev = standard_deviation(counts)
-        infos.append( (std_dev, team_id, corner_counts) )
+        infos.append((std_dev, team_id, corner_counts))
 
     infos.sort(reverse=True)
     return infos
@@ -115,7 +117,7 @@ parser.add_argument('schedule_file', help='schedule to examine')
 
 args = parser.parse_args()
 
-#print("\n".join(lines))
+# print("\n".join(lines))
 
 ignores = map(int, args.ignore_ids.split(',')) if args.ignore_ids else []
 

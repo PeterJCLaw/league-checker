@@ -1,6 +1,5 @@
 import argparse
 import collections
-import sys
 
 import helpers
 
@@ -53,8 +52,8 @@ for tla, opponents in c.items():
         print('{0} repeats {1} opponents lots of times: {2}'.format(tla, len(lots_repeats), lots_repeats))
         print('{0} misses {1} opponents: {2}'.format(tla, len(missed), missed))
     else:
-        print('{0: <4} faces {1: >2}, misses {2: >2}, repeats {3: >2} more than {4} times' \
-                .format(tla, len(faced), len(missed), len(lots_repeats), LOTS_REPEATS_LIMIT), end=' ')
+        print('{0: <4} faces {1: >2}, misses {2: >2}, repeats {3: >2} more than {4} times'
+              .format(tla, len(faced), len(missed), len(lots_repeats), LOTS_REPEATS_LIMIT), end=' ')
         if len(lots_repeats) > 1:
             worst = lots_repeats.most_common(1)[0]
             if worst[1] > 10:
