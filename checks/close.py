@@ -17,7 +17,7 @@ def main(schedule_file: Path) -> None:
     match_num = 1
 
     for line in lines:
-        teams = line.split('|')
+        teams = line.split(helpers.SEPARATOR)
         for tla in teams:
             matches[tla].append(match_num)
 

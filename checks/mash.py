@@ -388,7 +388,7 @@ if not args.auto_alter:
 
 cur_match_no = 0
 for line in lines:
-    if len(line) > 0 and line[0] == '#':
+    if len(line) > 0 and line[0] == helpers.COMMENT_CHAR:
         print(line)
         continue
 
@@ -400,15 +400,15 @@ for line in lines:
             g1, g2 = bestmatch
             plist = list(g1)
             plist += list(g2)
-            print("|".join(plist))
+            print(helpers.SEPARATOR.join(plist))
         else:
             (g1, g2), (g3, g4) = bestmatch  # type: ignore[assignment]
             plist = list(g1)
             plist += list(g2)
-            print("|".join(plist))
+            print(helpers.SEPARATOR.join(plist))
             plist = list(g3)
             plist += list(g4)
-            print("|".join(plist))
+            print(helpers.SEPARATOR.join(plist))
     elif args.multimatch and cur_match_no == args.matchno + 1:
         pass  # already printed it
     else:

@@ -12,7 +12,7 @@ def main(schedule_file: Path, verbose: bool) -> None:
     matches = []
     lines = helpers.load_lines(schedule_file)
     for line in lines:
-        players = line.split('|')
+        players = line.split(helpers.SEPARATOR)
         while len(players) > 4:
             matches.append(players[0:4])
             players = players[4:]

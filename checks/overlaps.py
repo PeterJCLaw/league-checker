@@ -11,7 +11,7 @@ def main(schedule_file: Path) -> None:
     lines = helpers.load_lines(schedule_file)
 
     for line in lines:
-        players = line.split('|')
+        players = line.split(helpers.SEPARATOR)
         assert len(players) == 4, "Only matches of size 4 are currently supported"
         matches.append(set(players))
 
