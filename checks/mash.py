@@ -316,9 +316,9 @@ else:
 
 def sortlist_cmp(x, y):
     # Project out the score, from the match
-    xs, xm = x
-    ys, ym = y
-    return scoring_cmp(xs, ys)
+    x_score, x_match = x
+    y_score, y_match = y
+    return scoring_cmp(x_score, y_score)
 
 
 scorelist = [max(scorelist, key=cmp_to_key(sortlist_cmp))]
