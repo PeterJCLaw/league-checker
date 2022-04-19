@@ -193,10 +193,8 @@ def scoring_cmp(x, y):
 # Select the desired match
 the_teams = matches[int(args.matchno)]
 first_match = frozenset(the_teams)
-second_match = set(the_teams)
 if args.multimatch:
     the_teams = the_teams + matches[args.matchno + 1]
-    second_match = frozenset(matches[args.matchno + 1])
 
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
