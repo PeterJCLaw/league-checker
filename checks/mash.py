@@ -60,7 +60,8 @@ for line in lines:
     players = line.split('|')
     matches.append(players)
 
-c = collections.defaultdict(collections.Counter)
+# Map TLA -> TLA -> count
+facing_counts: DefaultDict[str, Counter[str]] = collections.defaultdict(collections.Counter)
 
 
 def calc_faced_in_game(game, container, sub):
@@ -97,7 +98,7 @@ for match in matches:
         cur_match_no += 1
         continue
 
-    calc_faced_in_match(match, c)
+    calc_faced_in_match(match, facing_counts)
     cur_match_no += 1
 
 num_after_matches = min(middle_idx + 2 + args.closeness, len(matches))
@@ -116,7 +117,7 @@ for match in after_matches:
     after_teams += match
 after_teams = frozenset(after_teams)
 
-all_teams = set(c.keys())
+all_teams = set(facing_counts.keys())
 
 
 def calc_scoring(sched):
@@ -276,7 +277,7 @@ def add_generated_match_sched(m, sched, sub):
 scorelist = []
 if not args.multimatch:
     for m in unique_matches:
-        sched = c
+        sched = facing_counts
         sched = add_generated_match_sched(m, sched, False)
         score = calc_scoring(sched)
         sched = add_generated_match_sched(m, sched, True)
@@ -285,14 +286,14 @@ if not args.multimatch:
 else:
     for m in match_pairs:
         m1, m2 = m
-        sched = c
+        sched = facing_counts
         sched = add_generated_match_sched(m1, sched, False)
         sched = add_generated_match_sched(m2, sched, False)
         score = calc_scoring(sched)
 
         sched = add_generated_match_sched(m1, sched, True)
         sched = add_generated_match_sched(m2, sched, True)
-        c = sched
+        facing_counts = sched
 
         scorelist.append((score, m))
 
