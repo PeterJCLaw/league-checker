@@ -2,9 +2,10 @@
 
 import sys
 import argparse
+import itertools
 import collections
+from typing import Set, Tuple, Counter, Iterable, FrozenSet, DefaultDict
 from functools import cmp_to_key
-from itertools import product
 
 import helpers
 
@@ -109,15 +110,8 @@ after_matches = matches[middle_idx + 2:num_after_matches]
 # Calculate the teams who'll conflict with players in our matches in multimatch
 # mode
 
-forward_teams = []
-for match in forward_matches:
-    forward_teams += match
-forward_teams = frozenset(forward_teams)
-
-after_teams = []
-for match in after_matches:
-    after_teams += match
-after_teams = frozenset(after_teams)
+forward_teams = frozenset(itertools.chain.from_iterable(forward_matches))
+after_teams = frozenset(itertools.chain.from_iterable(after_matches))
 
 all_teams = set(facing_counts.keys())
 
@@ -202,50 +196,70 @@ if args.multimatch:
 # Now enumerate the set of unique matches that can be played with the teams
 # in this match, re-ordered. Don't do anything fancy.
 
-unique_games = set()
 
-# Generate all possible 4-team combinations via generating all combinations,
-# and canonicalising the order to avoid equivalent orderings being inserted.
-for comb in product(the_teams, repeat=4):
-    # Duplicate members?
-    theset = frozenset(comb)
-    if len(theset) != 4:
-        continue
+def get_unique_games(teams: Iterable[str]) -> Set[FrozenSet[str]]:
+    """
+    Generate all possible 4-team combinations via generating all combinations,
+    and canonicalising the order to avoid equivalent orderings being inserted.
+    """
+    unique_games = set()
 
-    if theset not in unique_games:
-        unique_games.add(theset)
-
-# Combine the set of unique games into a set of matches. Guard against the same
-# match but in a different order being found.
-unique_matches = set()
-for comb in product(unique_games, repeat=2):
-    # Test that we actually have all 8 players playing in this match.
-    if not comb[0].isdisjoint(comb[1]):
-        continue
-
-    g1 = comb[0]
-    g2 = comb[1]
-
-    # In multimatch mode, check that the match is either a completely unchanged
-    # set of teams from either match, or only has one team difference. This
-    # means we only explore one pair of teams swapping matches, keeping the size
-    # of exploration feasible.
-    if args.multimatch:
-        both = g1 | g2
-        inter_first = both & first_match
-
-        thelen = len(inter_first)
-        if thelen != 0 and thelen != 1 and thelen != 7 and thelen != 8:
+    for comb in itertools.product(the_teams, repeat=4):
+        # Duplicate members?
+        theset = frozenset(comb)
+        if len(theset) != 4:
             continue
 
-    if (g2, g1) in unique_matches:
-        continue
-    unique_matches.add((g1, g2))
+        if theset not in unique_games:
+            unique_games.add(theset)
+
+    return unique_games
+
+
+unique_games = get_unique_games(the_teams)
+
+
+def get_unique_matches(
+    unique_games: Set[FrozenSet[str]],
+    multimatch: bool,
+) -> Set[Tuple[FrozenSet[str], FrozenSet[str]]]:
+    """
+    Combine the set of unique games into a set of matches. Guard against the same
+    match but in a different order being found.
+    """
+
+    unique_matches = set()
+    for g1, g2 in itertools.product(unique_games, repeat=2):
+        # Test that we actually have all 8 players playing in this match.
+        if not g1.isdisjoint(g2):
+            continue
+
+        # In multimatch mode, check that the match is either a completely unchanged
+        # set of teams from either match, or only has one team difference. This
+        # means we only explore one pair of teams swapping matches, keeping the size
+        # of exploration feasible.
+        if multimatch:
+            both = g1 | g2
+            inter_first = both & first_match
+
+            thelen = len(inter_first)
+            if thelen != 0 and thelen != 1 and thelen != 7 and thelen != 8:
+                continue
+
+        if (g2, g1) in unique_matches:
+            continue
+        unique_matches.add((g1, g2))
+
+    return unique_matches
+
+
+unique_matches = get_unique_matches(unique_games, args.multimatch)
+
 
 # In multimatch mode, turn the unique matches set into a set of match pairs.
 match_pairs = set()
 if args.multimatch:
-    for comb in product(unique_matches, repeat=2):
+    for comb in itertools.product(unique_matches, repeat=2):
         m1, m2 = comb
         set1, set2 = m1
         set3, set4 = m2
