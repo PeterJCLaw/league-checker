@@ -2,10 +2,14 @@
 
 import argparse
 import collections
-from typing import Counter, DefaultDict
+from typing import Counter, Collection, DefaultDict
 from pathlib import Path
 
 import helpers
+
+
+def join(values: Collection[str]) -> str:
+    return ','.join(sorted(values))
 
 
 def main(schedule_file: Path, verbose: bool) -> None:
@@ -48,10 +52,11 @@ def main(schedule_file: Path, verbose: bool) -> None:
                 lots_repeats[opp] = times
 
         if verbose:
-            print(f"{tla} faces {len(faced)} opponents: {faced}")
+            print(f"{tla} faces {len(faced)} opponents: {join(faced)}")
             print(f"{tla} repeats {len(all_repeats)} opponents: {all_repeats}")
             print(f"{tla} repeats {len(lots_repeats)} opponents lots of times: {lots_repeats}")
-            print(f"{tla} misses {len(missed)} opponents: {missed}")
+            print(f"{tla} misses {len(missed)} opponents: {join(missed)}")
+            print()
         else:
             print(
                 f"{tla: <4} faces {len(faced): >2}, "
