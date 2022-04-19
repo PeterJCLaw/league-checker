@@ -20,9 +20,9 @@ def variance(numbers):
 
     mean_value = mean(numbers)
 
-    sqaure_deviations = [(n - mean_value)**2 for n in numbers]
+    square_deviations = [(n - mean_value)**2 for n in numbers]
 
-    return mean(sqaure_deviations)
+    return mean(square_deviations)
 
 
 def standard_deviation(numbers):
