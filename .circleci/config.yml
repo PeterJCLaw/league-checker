@@ -68,6 +68,7 @@ executors:
     docker:
       - image: circleci/python:<< parameters.version >>
 
+
 jobs:
   lint:
     <<: *parametrised-python-executor
@@ -86,10 +87,30 @@ jobs:
             source venv/bin/activate
             ./script/linting/lint
 
+  typecheck:
+    <<: *parametrised-python-executor
+
+    steps:
+      - checkout
+
+      - *build-checksum-file
+      - *restore-dependencies-cache
+      - *install-dependencies
+      - *save-dependencies-cache
+
+      - run:
+          name: Run Mypy
+          command: |
+            source venv/bin/activate
+            ./script/typing/check
+
+
 workflows:
   version: 2.1
 
   validate:
     jobs:
       - lint:
+          <<: *python-top-and-bottom-version-matrix
+      - typecheck:
           <<: *python-top-and-bottom-version-matrix
