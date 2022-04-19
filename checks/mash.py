@@ -21,7 +21,7 @@ if args.multimatch and (args.matches == 0 or args.closeness == 0):
     sys.exit(1)
 
 if args.multimatch and ((args.matchno + 1) % args.matches) == 0:
-    print("Can't multi-match schedule over round boundries, skipping this one", file=sys.stderr)
+    print("Can't multi-match schedule over round boundaries, skipping this one", file=sys.stderr)
     args.multimatch = False
 
 matches = []
