@@ -6,6 +6,8 @@ import collections
 from functools import cmp_to_key
 from itertools import product
 
+import helpers
+
 ap = argparse.ArgumentParser(
     description="Identify teams that can be swapped between games inside matches",
 )
@@ -51,14 +53,14 @@ if args.multimatch and ((args.matchno + 1) % args.matches) == 0:
     print("Can't multi-match schedule over round boundaries, skipping this one", file=sys.stderr)
     args.multimatch = False
 
-matches = []
-lines = [x.strip() for x in open(args.infile)]
-for line in lines:
-    if len(line) > 0 and line[0] == '#':
-        continue
+with open(args.infile) as f:
+    lines = [x.strip() for x in f]
 
-    players = line.split('|')
-    matches.append(players)
+matches = [
+    line.split(helpers.SEPARATOR)
+    for line in lines
+    if line and line[0] != helpers.COMMENT_CHAR
+]
 
 # Map TLA -> TLA -> count
 facing_counts: DefaultDict[str, Counter[str]] = collections.defaultdict(collections.Counter)
