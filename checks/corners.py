@@ -3,12 +3,14 @@
 import math
 import random
 import argparse
-from typing import Sequence
+from typing import Optional, Sequence
 from pathlib import Path
 from itertools import chain
 from collections import Counter, defaultdict
 
 import helpers
+
+_DEFAULT_NUM_CORNERS = 4
 
 
 def mean(numbers):
@@ -111,7 +113,12 @@ def print_schedule(writer, schedule):
         print(helpers.SEPARATOR.join(teams), file=writer)
 
 
-def main(schedule_file: Path, num_corners: int, ignore_ids: Sequence[int], fix: Path) -> None:
+def main(
+    schedule_file: Path,
+    num_corners: int = _DEFAULT_NUM_CORNERS,
+    ignore_ids: Sequence[int] = (),
+    fix: Optional[Path] = None,
+) -> None:
     schedule = load_schedule(schedule_file, num_corners)
     assert schedule, "Schedule file was empty!"
 
@@ -149,7 +156,7 @@ def parse_args() -> argparse.Namespace:
         '--num-corners',
         type=int,
         help="The number of zones in the arena (default: %(default)s).",
-        default=4,
+        default=_DEFAULT_NUM_CORNERS,
     )
     parser.add_argument(
         '--fix',

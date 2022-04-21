@@ -7,12 +7,14 @@ from pathlib import Path
 
 import helpers
 
+_DEFAULT_VERBOSE = False
+
 
 def join(values: Collection[str]) -> str:
     return ','.join(sorted(values))
 
 
-def main(schedule_file: Path, verbose: bool) -> None:
+def main(schedule_file: Path, verbose: bool = _DEFAULT_VERBOSE) -> None:
     matches = []
     lines = helpers.load_lines(schedule_file)
     for line in lines:
@@ -74,7 +76,7 @@ def main(schedule_file: Path, verbose: bool) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser("Displays statistics about which others a team have faced")
     parser.add_argument('schedule_file', help="schedule to examine")
-    parser.add_argument('--verbose', action='store_true', default=False)
+    parser.add_argument('--verbose', action='store_true', default=_DEFAULT_VERBOSE)
     return parser.parse_args()
 
 
