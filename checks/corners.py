@@ -61,7 +61,7 @@ def convert(schedule, teams_to_ignore=()):
     # Maps team -> corner -> count
     teams = defaultdict(Counter)
 
-    for match_id, matches in enumerate(schedule):
+    for matches in schedule:
         for teams_this_match in matches:
             for corner, team_id in enumerate(teams_this_match):
                 teams[team_id][corner] += 1
