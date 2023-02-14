@@ -1,4 +1,5 @@
-from typing import List
+import re
+from typing import List, Tuple, Union
 from pathlib import Path
 
 COMMENT_CHAR = '#'
@@ -14,3 +15,15 @@ def load_lines(file_path: Path) -> List[str]:
                 lines.append(text)
 
     return lines
+
+
+def human_sort_key(text: str) -> Tuple[Union[str, int], ...]:
+    """
+    Split a string into text and numeric components so that they can be sorted
+    in "human" order.
+    """
+    parts = re.findall('(\d+)', text)
+    return tuple(
+        int(x) if x.isdigit() else x
+        for x in parts
+    )
