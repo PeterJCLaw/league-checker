@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import collections
-from typing import List, Tuple, DefaultDict
+from typing import DefaultDict
 from pathlib import Path
 
 import helpers
@@ -10,7 +12,7 @@ import helpers
 WARN_MIN_GAP = 2
 
 
-def _sort_key(value: Tuple[str, int, List[int]]) -> Tuple[int, helpers.HumanSortTuple]:
+def _sort_key(value: tuple[str, int, list[int]]) -> tuple[int, helpers.HumanSortTuple]:
     tla, min_break, _ = value
     return min_break, helpers.human_sort_key(tla)
 
@@ -18,8 +20,8 @@ def _sort_key(value: Tuple[str, int, List[int]]) -> Tuple[int, helpers.HumanSort
 def main(schedule_file: Path) -> None:
     lines = helpers.load_lines(schedule_file)
 
-    matches: DefaultDict[str, List[int]] = collections.defaultdict(list)
-    breaks: DefaultDict[str, List[int]] = collections.defaultdict(list)
+    matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
+    breaks: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
     match_num = 1
 

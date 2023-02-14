@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import collections
 import dataclasses
-from typing import Set, Dict, Tuple, Counter, Collection, DefaultDict
+from typing import Counter, Collection, DefaultDict
 from pathlib import Path
 
 import helpers
@@ -18,17 +20,17 @@ class TeamFacings:
     tla: TLA
     opponents: Counter[TLA]
     lots_repeats: Counter[TLA]
-    missed: Set[TLA]
+    missed: set[TLA]
 
     @classmethod
     def build(
         cls,
         tla: TLA,
         opponents: Counter[TLA],
-        all_teams: Set[TLA],
+        all_teams: set[TLA],
         *,
         lots_repeats_limit: int,
-    ) -> 'TeamFacings':
+    ) -> TeamFacings:
         missed = all_teams - opponents.keys()
 
         del opponents[tla]
@@ -50,10 +52,10 @@ class TeamFacings:
         return self.opponents.keys()
 
     @property
-    def repeats(self) -> Dict[TLA, int]:
+    def repeats(self) -> dict[TLA, int]:
         return {x: y for x, y in self.opponents.items() if y > 1}
 
-    def sort_key(self) -> Tuple[int, helpers.HumanSortTuple]:
+    def sort_key(self) -> tuple[int, helpers.HumanSortTuple]:
         return -len(self.lots_repeats), helpers.human_sort_key(self.tla)
 
 
