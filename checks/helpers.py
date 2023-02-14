@@ -24,7 +24,7 @@ def human_sort_key(text: str) -> HumanSortTuple:
     Split a string into text and numeric components so that they can be sorted
     in "human" order.
     """
-    parts = re.findall('(\d+)', text)
+    parts = re.findall(r'(\d+)', text)
     return tuple(
         int(x) if x.isdigit() else x
         for x in parts
