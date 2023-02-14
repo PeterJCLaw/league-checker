@@ -47,9 +47,7 @@ def main(schedule_file: Path) -> None:
 
     count_n = 0
     for tla, min_break, btla in sorted(min_breaks, key=_sort_key):
-        c: Counter[int] = collections.Counter()
-        for x in sorted(btla):
-            c[x] += 1
+        c = collections.Counter(btla)
         if min_break == WARN_MIN_GAP:
             count_n += 1
         print(f"{tla}\t{min_break}\t{c[min_break]}\t{btla}")
