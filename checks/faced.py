@@ -3,7 +3,7 @@
 import argparse
 import collections
 import dataclasses
-from typing import Set, Dict, Tuple, Union, Counter, Collection, DefaultDict
+from typing import Set, Dict, Tuple, Counter, Collection, DefaultDict
 from pathlib import Path
 
 import helpers
@@ -53,7 +53,7 @@ class TeamFacings:
     def repeats(self) -> Dict[TLA, int]:
         return {x: y for x, y in self.opponents.items() if y > 1}
 
-    def sort_key(self) -> Tuple[int, Tuple[Union[str, int], ...]]:
+    def sort_key(self) -> Tuple[int, helpers.HumanSortTuple]:
         return -len(self.lots_repeats), helpers.human_sort_key(self.tla)
 
 

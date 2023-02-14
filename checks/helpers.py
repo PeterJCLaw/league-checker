@@ -2,6 +2,8 @@ import re
 from typing import List, Tuple, Union
 from pathlib import Path
 
+HumanSortTuple = Tuple[Union[str, int], ...]
+
 COMMENT_CHAR = '#'
 SEPARATOR = '|'
 
@@ -17,7 +19,7 @@ def load_lines(file_path: Path) -> List[str]:
     return lines
 
 
-def human_sort_key(text: str) -> Tuple[Union[str, int], ...]:
+def human_sort_key(text: str) -> HumanSortTuple:
     """
     Split a string into text and numeric components so that they can be sorted
     in "human" order.
