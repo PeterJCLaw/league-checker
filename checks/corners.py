@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import math
 import random
 import argparse
-from typing import Optional, Sequence
+from typing import Sequence
 from pathlib import Path
 from itertools import chain
 from collections import Counter, defaultdict
@@ -117,7 +119,7 @@ def main(
     schedule_file: Path,
     num_corners: int = _DEFAULT_NUM_CORNERS,
     ignore_ids: Sequence[int] = (),
-    fix: Optional[Path] = None,
+    fix: Path | None = None,
 ) -> None:
     schedule = load_schedule(schedule_file, num_corners)
     assert schedule, "Schedule file was empty!"

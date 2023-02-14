@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import collections
-from typing import List, Tuple, DefaultDict
+from typing import DefaultDict
 from pathlib import Path
 
 import helpers
@@ -20,7 +22,7 @@ def main(schedule_file: Path) -> None:
     match_enumeration = tuple(enumerate(matches))
 
     # Size of overlap -> match numbers
-    overlaps: DefaultDict[int, List[Tuple[int, int]]] = collections.defaultdict(list)
+    overlaps: DefaultDict[int, list[tuple[int, int]]] = collections.defaultdict(list)
 
     for idx, match in match_enumeration:
         for other_idx, other_match in match_enumeration[idx + 1:]:

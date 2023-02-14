@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import re
-from typing import List, Tuple, Union
+from typing import Tuple, Union
 from pathlib import Path
 
 HumanSortTuple = Tuple[Union[str, int], ...]
@@ -8,7 +10,7 @@ COMMENT_CHAR = '#'
 SEPARATOR = '|'
 
 
-def load_lines(file_path: Path) -> List[str]:
+def load_lines(file_path: Path) -> list[str]:
     lines = []
     with open(file_path) as f:
         for line in f.readlines():
