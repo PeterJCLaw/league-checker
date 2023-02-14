@@ -10,6 +10,11 @@ from pathlib import Path
 import helpers
 
 
+def _sort_key(value: tuple[str, int]) -> tuple[int, helpers.HumanSortTuple]:
+    entrant, count = value
+    return -count, helpers.human_sort_key(entrant)
+
+
 def main(schedule_file: Path) -> None:
     lines = helpers.load_lines(schedule_file)
 
@@ -20,7 +25,7 @@ def main(schedule_file: Path) -> None:
         for team in teams:
             counter[team] += 1
 
-    for entrant, count in counter.most_common():
+    for entrant, count in sorted(counter.items(), key=_sort_key):
         print(f"{entrant}: {count}")
 
 
