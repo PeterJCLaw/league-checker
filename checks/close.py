@@ -2,12 +2,17 @@
 
 import argparse
 import collections
-from typing import List, Counter, DefaultDict
+from typing import List, Tuple, Counter, DefaultDict
 from pathlib import Path
 
 import helpers
 
 WARN_MIN_GAP = 2
+
+
+def _sort_key(value: Tuple[str, int, List[int]]) -> Tuple[int, helpers.HumanSortTuple]:
+    tla, min_break, _ = value
+    return min_break, helpers.human_sort_key(tla)
 
 
 def main(schedule_file: Path) -> None:
@@ -41,7 +46,7 @@ def main(schedule_file: Path) -> None:
     print('Team\tMin-gap\tCount\tGaps')
 
     count_n = 0
-    for tla, min_break, btla in sorted(min_breaks, key=lambda x: x[1]):
+    for tla, min_break, btla in sorted(min_breaks, key=_sort_key):
         c: Counter[int] = collections.Counter()
         for x in sorted(btla):
             c[x] += 1
