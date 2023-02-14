@@ -2,7 +2,7 @@
 
 import argparse
 import collections
-from typing import List, Tuple, Counter, DefaultDict
+from typing import List, Tuple, DefaultDict
 from pathlib import Path
 
 import helpers
