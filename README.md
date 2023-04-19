@@ -1,6 +1,6 @@
 # League Checker
 
-[![CircleCI](https://circleci.com/gh/PeterJCLaw/league-checker/tree/master.svg?style=svg)](https://circleci.com/gh/PeterJCLaw/league-checker/tree/master)
+[![CircleCI](https://circleci.com/gh/PeterJCLaw/league-checker/tree/main.svg?style=svg)](https://circleci.com/gh/PeterJCLaw/league-checker/tree/main)
 
 Checks for a schedule of league matches.
 
