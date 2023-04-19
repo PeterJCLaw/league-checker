@@ -35,7 +35,7 @@ def main(schedule_file: Path) -> None:
     min_breaks = []
 
     for tla, team_matches in matches.items():
-        last_match = -25
+        last_match = float('-inf')
         min_break = 200
         for match in team_matches:
             diff = match - last_match
@@ -43,7 +43,7 @@ def main(schedule_file: Path) -> None:
             if diff < min_break:
                 min_break = diff
             last_match = match
-        min_breaks.append((tla, min_break, breaks[tla]))
+        min_breaks.append((tla, min_break, breaks[tla][1:]))
 
     print('Team\tMin-gap\tCount\tGaps')
 
