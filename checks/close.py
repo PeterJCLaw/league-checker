@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import collections
 from typing import DefaultDict
 from pathlib import Path
@@ -35,15 +36,11 @@ def main(schedule_file: Path) -> None:
     min_breaks = []
 
     for tla, team_matches in matches.items():
-        last_match = float('-inf')
-        min_break = 200
-        for match in team_matches:
+        for last_match, match in itertools.pairwise(team_matches):
             diff = match - last_match
             breaks[tla].append(diff)
-            if diff < min_break:
-                min_break = diff
             last_match = match
-        min_breaks.append((tla, min_break, breaks[tla][1:]))
+        min_breaks.append((tla, min(breaks[tla]), breaks[tla]))
 
     print('Team\tMin-gap\tCount\tGaps')
 
