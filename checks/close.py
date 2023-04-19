@@ -5,12 +5,23 @@ from __future__ import annotations
 import argparse
 import itertools
 import collections
-from typing import DefaultDict
+from typing import TypeVar, DefaultDict
 from pathlib import Path
+from collections.abc import Iterable
 
 import helpers
 
+T = TypeVar('T')
+
 WARN_MIN_GAP = 2
+
+
+def pairwise(iterable: Iterable[T]) -> Iterable[tuple[T, T]]:
+    # From the docs at https://docs.python.org/3/library/itertools.html#itertools.pairwise
+    # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
 
 
 def _sort_key(value: tuple[str, int, list[int]]) -> tuple[int, helpers.HumanSortTuple]:
@@ -36,7 +47,7 @@ def main(schedule_file: Path) -> None:
     min_breaks = []
 
     for tla, team_matches in matches.items():
-        for last_match, match in itertools.pairwise(team_matches):
+        for last_match, match in pairwise(team_matches):
             diff = match - last_match
             breaks[tla].append(diff)
             last_match = match
