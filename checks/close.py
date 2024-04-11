@@ -77,12 +77,14 @@ def compute_breaks(lines: Sequence[str]) -> list[TeamBreaks]:
 
 
 def _score(team_breaks: TeamBreaks) -> float:
-    counts = collections.Counter()
+    counts: collections.Counter[int] = collections.Counter()
+
     def gap_cost(gap: int) -> float:
         if gap == 1:
             return float('inf')
         counts[gap] += 1
         return counts[gap] / gap
+
     return sum(gap_cost(x) for x in team_breaks.breaks)
 
 
