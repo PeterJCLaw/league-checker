@@ -3,17 +3,37 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import itertools
 import collections
+import dataclasses
 from typing import TypeVar, DefaultDict
 from pathlib import Path
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 
 import helpers
 
+WARN_MIN_GAP = 2
+
 T = TypeVar('T')
 
-WARN_MIN_GAP = 2
+
+@dataclasses.dataclass(frozen=True)
+class TeamBreaks:
+    tla: str
+    breaks: Sequence[int]
+
+    @functools.cached_property
+    def min_break(self) -> int:
+        return min(self.breaks)
+
+    @functools.cached_property
+    def counts(self) -> collections.Counter[int]:
+        return collections.Counter(self.breaks)
+
+    @functools.cached_property
+    def min_break_count(self) -> int:
+        return self.counts[self.min_break]
 
 
 def pairwise(iterable: Iterable[T]) -> Iterable[tuple[T, T]]:
@@ -24,16 +44,14 @@ def pairwise(iterable: Iterable[T]) -> Iterable[tuple[T, T]]:
     return zip(a, b)
 
 
-def _sort_key(value: tuple[str, int, list[int], collections.Counter[int]]) -> tuple[int, helpers.HumanSortTuple]:
-    tla, min_break, _, counts = value
-    return min_break, -counts[min_break], helpers.human_sort_key(tla)
+def _sort_key(value: TeamBreaks) -> tuple[int, helpers.HumanSortTuple]:
+    return value.min_break, -value.min_break_count, helpers.human_sort_key(value.tla)
 
 
 def main(schedule_file: Path) -> None:
     lines = helpers.load_lines(schedule_file)
 
     matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
-    breaks: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
     match_num = 1
 
@@ -47,25 +65,20 @@ def main(schedule_file: Path) -> None:
     min_breaks = []
 
     for tla, team_matches in matches.items():
+        breaks = []
         for last_match, match in pairwise(team_matches):
             diff = match - last_match
-            breaks[tla].append(diff)
+            breaks.append(diff)
             last_match = match
-        tla_breaks = breaks[tla]
-        min_breaks.append((
-            tla,
-            min(tla_breaks),
-            tla_breaks,
-            collections.Counter(tla_breaks),
-        ))
+        min_breaks.append(TeamBreaks(tla, breaks))
 
     print('Team\tMin-gap\tCount\tGaps')
 
     count_n = 0
-    for tla, min_break, tla_breaks, counts in sorted(min_breaks, key=_sort_key):
-        if min_break == WARN_MIN_GAP:
+    for team_breaks in sorted(min_breaks, key=_sort_key):
+        if team_breaks.min_break == WARN_MIN_GAP:
             count_n += 1
-        print(f"{tla}\t{min_break}\t{counts[min_break]}\t{tla_breaks}")
+        print(f"{team_breaks.tla}\t{team_breaks.min_break}\t{team_breaks.min_break_count}\t{team_breaks.breaks}")
 
     print()
     print(f"{count_n} teams have a minimum gap of {WARN_MIN_GAP}")
