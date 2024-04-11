@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import random
 import argparse
 import functools
 import itertools
@@ -9,11 +10,13 @@ import collections
 import dataclasses
 from typing import TypeVar, DefaultDict
 from pathlib import Path
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 
+import tqdm
 import helpers
 
 WARN_MIN_GAP = 2
+NO_PERMUTE = 'none'
 
 T = TypeVar('T')
 
@@ -48,7 +51,7 @@ def _sort_key(value: TeamBreaks) -> tuple[int, int, helpers.HumanSortTuple]:
     return value.min_break, -value.min_break_count, helpers.human_sort_key(value.tla)
 
 
-def compute_breaks(lines: list[str]) -> list[TeamBreaks]:
+def compute_breaks(lines: Sequence[str]) -> list[TeamBreaks]:
     matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
     match_num = 1
@@ -73,10 +76,58 @@ def compute_breaks(lines: list[str]) -> list[TeamBreaks]:
     return min_breaks
 
 
-def main(schedule_file: Path) -> None:
+def _score(team_breaks: TeamBreaks) -> float:
+    return sum(1 / x for x in team_breaks.breaks)
+
+
+def _score_many(min_breaks: list[TeamBreaks]) -> float:
+    return sum(_score(x) for x in min_breaks)
+
+
+def _random_permute(lines: list[str]) -> Iterator[Sequence[str]]:
+    while True:
+        out = lines[:]
+        random.shuffle(out)
+        yield out
+
+
+def _ordered_permute(lines: list[str]) -> Iterator[Sequence[str]]:
+    return itertools.permutations(lines)
+
+
+def main(schedule_file: Path, permute: str = NO_PERMUTE) -> None:
     lines = helpers.load_lines(schedule_file)
+    original = lines[:]
 
     min_breaks = compute_breaks(lines)
+
+    best: tuple[float, list[TeamBreaks], Sequence[str]]
+    best = (_score_many(min_breaks), min_breaks, lines[:])
+
+    if permute != NO_PERMUTE:
+        print(best[0])
+
+        permuter = {
+            'random': _random_permute,
+            'ordered': _ordered_permute,
+        }[permute]
+
+        try:
+            for permutation in tqdm.tqdm(permuter(lines)):
+                min_breaks = compute_breaks(permutation)
+                score = _score_many(min_breaks)
+                if score < best[0]:
+                    print("Better!", score)
+                    best = (score, min_breaks, permutation)
+        except KeyboardInterrupt:
+            pass
+
+        score, min_breaks, permutation = best
+        print(score)
+
+        if permutation == original:
+            print("No improvement")
+            return
 
     print('Team\tMin-gap\tCount\tGaps')
 
@@ -94,6 +145,12 @@ def main(schedule_file: Path) -> None:
     print()
     print(f"{count_n} teams have a minimum gap of {WARN_MIN_GAP}")
 
+    if permute != NO_PERMUTE:
+        print()
+        print()
+
+        print("\n".join(permutation))
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=(
@@ -102,6 +159,12 @@ def parse_args() -> argparse.Namespace:
         "match intervals off, and then another match."
     ))
     parser.add_argument('schedule_file', type=Path, help="Schedule file to inspect")
+    parser.add_argument(
+        '--permute',
+        choices=('random', 'ordered', NO_PERMUTE),
+        default=NO_PERMUTE,
+        help="Attempt to improve closeness by permuting the matches",
+    )
     return parser.parse_args()
 
 
