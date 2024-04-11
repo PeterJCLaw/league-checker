@@ -44,11 +44,11 @@ def pairwise(iterable: Iterable[T]) -> Iterable[tuple[T, T]]:
     return zip(a, b)
 
 
-def _sort_key(value: TeamBreaks) -> tuple[int, helpers.HumanSortTuple]:
+def _sort_key(value: TeamBreaks) -> tuple[int, int, helpers.HumanSortTuple]:
     return value.min_break, -value.min_break_count, helpers.human_sort_key(value.tla)
 
 
-def compute_breaks(lines: list[str]) -> list[Breaks]:
+def compute_breaks(lines: list[str]) -> list[TeamBreaks]:
     matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
     match_num = 1
