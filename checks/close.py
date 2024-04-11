@@ -48,9 +48,7 @@ def _sort_key(value: TeamBreaks) -> tuple[int, helpers.HumanSortTuple]:
     return value.min_break, -value.min_break_count, helpers.human_sort_key(value.tla)
 
 
-def main(schedule_file: Path) -> None:
-    lines = helpers.load_lines(schedule_file)
-
+def compute_breaks(lines: list[str]) -> list[Breaks]:
     matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
     match_num = 1
@@ -71,6 +69,14 @@ def main(schedule_file: Path) -> None:
             breaks.append(diff)
             last_match = match
         min_breaks.append(TeamBreaks(tla, breaks))
+
+    return min_breaks
+
+
+def main(schedule_file: Path) -> None:
+    lines = helpers.load_lines(schedule_file)
+
+    min_breaks = compute_breaks(lines)
 
     print('Team\tMin-gap\tCount\tGaps')
 
