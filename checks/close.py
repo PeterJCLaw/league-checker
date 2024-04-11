@@ -113,11 +113,12 @@ def main(schedule_file: Path, permute: str = NO_PERMUTE) -> None:
         }[permute]
 
         try:
-            for permutation in tqdm.tqdm(permuter(lines)):
+            bar = tqdm.tqdm(permuter(lines))
+            for permutation in bar:
                 min_breaks = compute_breaks(permutation)
                 score = _score_many(min_breaks)
                 if score < best[0]:
-                    print("Better!", score)
+                    bar.write(f"Better! {score}")
                     best = (score, min_breaks, permutation)
         except KeyboardInterrupt:
             pass
