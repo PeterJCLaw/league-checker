@@ -84,7 +84,12 @@ def main(schedule_file: Path) -> None:
     for team_breaks in sorted(min_breaks, key=_sort_key):
         if team_breaks.min_break == WARN_MIN_GAP:
             count_n += 1
-        print(f"{team_breaks.tla}\t{team_breaks.min_break}\t{team_breaks.min_break_count}\t{team_breaks.breaks}")
+        print("\t".join(str(x) for x in (
+            team_breaks.tla,
+            team_breaks.min_break,
+            team_breaks.min_break_count,
+            team_breaks.breaks,
+        )))
 
     print()
     print(f"{count_n} teams have a minimum gap of {WARN_MIN_GAP}")
