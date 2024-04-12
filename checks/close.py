@@ -8,7 +8,7 @@ import functools
 import itertools
 import collections
 import dataclasses
-from typing import TypeVar, DefaultDict
+from typing import TypeVar, Protocol, DefaultDict
 from pathlib import Path
 from collections.abc import Iterable, Iterator, Sequence
 
@@ -21,6 +21,7 @@ Schedule = Sequence[str]
 
 WARN_MIN_GAP = 2
 NO_PERMUTE = 'none'
+NO_PERMUTE_ADJUSTER = 'none'
 
 
 @dataclasses.dataclass(frozen=True)
@@ -105,7 +106,61 @@ def _ordered_permute(schedule: Schedule) -> Iterator[Schedule]:
     return itertools.permutations(schedule)
 
 
-def main(schedule_file: Path, permute: str = NO_PERMUTE) -> None:
+class PermuteAdjuster(Protocol):
+    def pre_adjust(self, schedule: Schedule) -> Schedule:
+        ...
+
+    def post_adjust(self, schedule: Schedule) -> Schedule:
+        ...
+
+
+class NoopAdjuster:
+    def pre_adjust(self, schedule: Schedule) -> Schedule:
+        return schedule
+
+    def post_adjust(self, schedule: Schedule) -> Schedule:
+        return schedule
+
+
+class ReversingAdjuster:
+    def pre_adjust(self, schedule: Schedule) -> Schedule:
+        return list(reversed(schedule))
+
+    def post_adjust(self, schedule: Schedule) -> Schedule:
+        return list(reversed(schedule))
+
+
+class SubsetAdjuster:
+    whole: Schedule
+    start = 46
+    end = 68
+
+    def pre_adjust(self, schedule: Schedule) -> Schedule:
+        self.whole = schedule[:]
+        return schedule[self.start: self.end]
+
+    def post_adjust(self, schedule: Schedule) -> Schedule:
+        return (  # type: ignore[no-any-return]
+            self.whole[:self.start]  # type: ignore[operator]
+            + list(schedule)
+            + self.whole[self.end:]
+        )
+
+
+def _get_adjuster(permute_adjuster: str) -> PermuteAdjuster:
+    registry: dict[str, type[PermuteAdjuster]] = {
+        'subset': SubsetAdjuster,
+        'reverse': ReversingAdjuster,
+        NO_PERMUTE_ADJUSTER: NoopAdjuster,
+    }
+    return registry[permute_adjuster]()
+
+
+def main(
+    schedule_file: Path,
+    permute: str = NO_PERMUTE,
+    permute_adjuster: str = NO_PERMUTE_ADJUSTER,
+) -> None:
     lines: Schedule = helpers.load_lines(schedule_file)
     original = lines[:]
 
@@ -122,9 +177,14 @@ def main(schedule_file: Path, permute: str = NO_PERMUTE) -> None:
             'ordered': _ordered_permute,
         }[permute]
 
+        adjuster = _get_adjuster(permute_adjuster)
+
         try:
+            lines = adjuster.pre_adjust(lines)
+
             bar = tqdm.tqdm(permuter(lines))
             for permutation in bar:
+                permutation = adjuster.post_adjust(permutation)
                 min_breaks = compute_breaks(permutation)
                 score = _score_many(min_breaks)
                 if score < best[0]:
@@ -175,6 +235,12 @@ def parse_args() -> argparse.Namespace:
         choices=('random', 'ordered', NO_PERMUTE),
         default=NO_PERMUTE,
         help="Attempt to improve closeness by permuting the matches",
+    )
+    parser.add_argument(
+        '--permute-adjuster',
+        choices=('reverse', 'subset', NO_PERMUTE_ADJUSTER),
+        default=NO_PERMUTE_ADJUSTER,
+        help="Adjust the lines before attempting to permute them",
     )
     return parser.parse_args()
 
