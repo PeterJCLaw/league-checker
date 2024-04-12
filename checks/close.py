@@ -17,6 +17,8 @@ import helpers
 
 T = TypeVar('T')
 
+Schedule = Sequence[str]
+
 WARN_MIN_GAP = 2
 NO_PERMUTE = 'none'
 
@@ -51,12 +53,12 @@ def _sort_key(value: TeamBreaks) -> tuple[int, int, helpers.HumanSortTuple]:
     return value.min_break, -value.min_break_count, helpers.human_sort_key(value.tla)
 
 
-def compute_breaks(lines: Sequence[str]) -> list[TeamBreaks]:
+def compute_breaks(schedule: Schedule) -> list[TeamBreaks]:
     matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
     match_num = 1
 
-    for line in lines:
+    for line in schedule:
         teams = line.split(helpers.SEPARATOR)
         for tla in teams:
             matches[tla].append(match_num)
@@ -92,19 +94,19 @@ def _score_many(min_breaks: list[TeamBreaks]) -> float:
     return sum(_score(x) for x in min_breaks)
 
 
-def _random_permute(lines: list[str]) -> Iterator[Sequence[str]]:
+def _random_permute(schedule: Schedule) -> Iterator[Schedule]:
     while True:
-        out = lines[:]
+        out = list(schedule)
         random.shuffle(out)
         yield out
 
 
-def _ordered_permute(lines: list[str]) -> Iterator[Sequence[str]]:
-    return itertools.permutations(lines)
+def _ordered_permute(schedule: Schedule) -> Iterator[Schedule]:
+    return itertools.permutations(schedule)
 
 
 def main(schedule_file: Path, permute: str = NO_PERMUTE) -> None:
-    lines = helpers.load_lines(schedule_file)
+    lines: Schedule = helpers.load_lines(schedule_file)
     original = lines[:]
 
     min_breaks = compute_breaks(lines)
