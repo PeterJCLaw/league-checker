@@ -17,7 +17,7 @@ import helpers
 
 T = TypeVar('T')
 
-Schedule = Sequence[str]
+Schedule = Sequence[Sequence[str]]
 
 WARN_MIN_GAP = 2
 NO_PERMUTE = 'none'
@@ -59,8 +59,7 @@ def compute_breaks(schedule: Schedule) -> list[TeamBreaks]:
 
     match_num = 1
 
-    for line in schedule:
-        teams = line.split(helpers.SEPARATOR)
+    for teams in schedule:
         for tla in teams:
             matches[tla].append(match_num)
 
@@ -161,13 +160,15 @@ def main(
     permute: str = NO_PERMUTE,
     permute_adjuster: str = NO_PERMUTE_ADJUSTER,
 ) -> None:
-    lines: Schedule = helpers.load_lines(schedule_file)
-    original = lines[:]
+    lines: Sequence[str] = helpers.load_lines(schedule_file)
 
-    min_breaks = compute_breaks(lines)
+    schedule: Schedule = [tuple(x.split(helpers.SEPARATOR)) for x in lines]
+    original = schedule[:]
 
-    best: tuple[float, list[TeamBreaks], Sequence[str]]
-    best = (_score_many(min_breaks), min_breaks, lines[:])
+    min_breaks = compute_breaks(schedule)
+
+    best: tuple[float, list[TeamBreaks], Schedule]
+    best = (_score_many(min_breaks), min_breaks, schedule[:])
 
     if permute != NO_PERMUTE:
         print(best[0])
@@ -180,9 +181,9 @@ def main(
         adjuster = _get_adjuster(permute_adjuster)
 
         try:
-            lines = adjuster.pre_adjust(lines)
+            schedule = adjuster.pre_adjust(schedule)
 
-            bar = tqdm.tqdm(permuter(lines))
+            bar = tqdm.tqdm(permuter(schedule))
             for permutation in bar:
                 permutation = adjuster.post_adjust(permutation)
                 min_breaks = compute_breaks(permutation)
@@ -220,7 +221,7 @@ def main(
         print()
         print()
 
-        print("\n".join(permutation))
+        print('\n'.join(helpers.SEPARATOR.join(x) for x in permutation))
 
 
 def parse_args() -> argparse.Namespace:
