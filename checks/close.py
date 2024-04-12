@@ -15,10 +15,10 @@ from collections.abc import Iterable, Iterator, Sequence
 import tqdm
 import helpers
 
+T = TypeVar('T')
+
 WARN_MIN_GAP = 2
 NO_PERMUTE = 'none'
-
-T = TypeVar('T')
 
 
 @dataclasses.dataclass(frozen=True)
