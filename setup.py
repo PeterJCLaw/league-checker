@@ -20,6 +20,10 @@ setup(
 
     packages=['checks'],
 
+    requires=[
+        'tqdm',
+    ],
+
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
