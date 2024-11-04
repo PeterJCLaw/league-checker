@@ -47,6 +47,10 @@ def main(schedule_file: Path) -> None:
                     ','.join(sorted(other_match)),
                 ))
 
+    if not overlaps:
+        print("No overlaps")
+        return
+
     print()
     print("Overlap summary")
     for size, overlapping_matches in overlaps.items():
