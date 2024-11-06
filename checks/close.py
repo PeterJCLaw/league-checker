@@ -82,7 +82,7 @@ def _score(team_breaks: TeamBreaks) -> float:
     counts: collections.Counter[int] = collections.Counter()
 
     def gap_cost(gap: int) -> float:
-        if gap == 1:
+        if gap <= 1:
             return float('inf')
         counts[gap] += 1
         return counts[gap] / gap
