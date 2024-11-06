@@ -8,7 +8,7 @@ import functools
 import itertools
 import collections
 import dataclasses
-from typing import TypeVar, Protocol, DefaultDict
+from typing import TypeVar, Callable, Protocol, DefaultDict
 from pathlib import Path
 from collections.abc import Iterable, Iterator, Sequence
 
@@ -155,6 +155,37 @@ def _get_adjuster(permute_adjuster: str) -> PermuteAdjuster:
     return registry[permute_adjuster]()
 
 
+def _handle_permutations(
+    min_breaks: list[TeamBreaks],
+    schedule: Schedule,
+    permuter: Callable[[Schedule], Iterator[Schedule]],
+    adjuster: PermuteAdjuster,
+) -> Schedule:
+    best: tuple[float, list[TeamBreaks], Schedule]
+    best = (_score_many(min_breaks), min_breaks, schedule[:])
+
+    print(best[0])
+
+    try:
+        schedule = adjuster.pre_adjust(schedule)
+
+        bar = tqdm.tqdm(permuter(schedule))
+        for permutation in bar:
+            permutation = adjuster.post_adjust(permutation)
+            min_breaks = compute_breaks(permutation)
+            score = _score_many(min_breaks)
+            if score < best[0]:
+                bar.write(f"Better! {score}")
+                best = (score, min_breaks, permutation)
+    except KeyboardInterrupt:
+        pass
+
+    score, min_breaks, permutation = best
+    print(score)
+
+    return permutation
+
+
 def main(
     schedule_file: Path,
     permute: str = NO_PERMUTE,
@@ -163,41 +194,21 @@ def main(
     lines: Sequence[str] = helpers.load_lines(schedule_file)
 
     schedule: Schedule = [tuple(x.split(helpers.SEPARATOR)) for x in lines]
-    original = schedule[:]
 
     min_breaks = compute_breaks(schedule)
 
-    best: tuple[float, list[TeamBreaks], Schedule]
-    best = (_score_many(min_breaks), min_breaks, schedule[:])
-
     if permute != NO_PERMUTE:
-        print(best[0])
+        permutation = _handle_permutations(
+            min_breaks,
+            tuple(schedule),
+            permuter={
+                'random': _random_permute,
+                'ordered': _ordered_permute,
+            }[permute],
+            adjuster=_get_adjuster(permute_adjuster),
+        )
 
-        permuter = {
-            'random': _random_permute,
-            'ordered': _ordered_permute,
-        }[permute]
-
-        adjuster = _get_adjuster(permute_adjuster)
-
-        try:
-            schedule = adjuster.pre_adjust(schedule)
-
-            bar = tqdm.tqdm(permuter(schedule))
-            for permutation in bar:
-                permutation = adjuster.post_adjust(permutation)
-                min_breaks = compute_breaks(permutation)
-                score = _score_many(min_breaks)
-                if score < best[0]:
-                    bar.write(f"Better! {score}")
-                    best = (score, min_breaks, permutation)
-        except KeyboardInterrupt:
-            pass
-
-        score, min_breaks, permutation = best
-        print(score)
-
-        if permutation == original:
+        if permutation == schedule:
             print("No improvement")
             return
 
