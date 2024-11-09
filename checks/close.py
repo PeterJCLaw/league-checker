@@ -31,6 +31,11 @@ class TeamBreaks:
 
     @functools.cached_property
     def min_break(self) -> int:
+        if not self.breaks:
+            # Cope with teams with only one appearance. These don't have a
+            # "break" as such since we don't count the start or end of the
+            # overall schedule (which is intentional).
+            return float('inf')  # type: ignore[return-value]
         return min(self.breaks)
 
     @functools.cached_property
