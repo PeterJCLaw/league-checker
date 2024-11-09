@@ -14,10 +14,9 @@ from collections.abc import Iterable, Iterator, Sequence
 
 import tqdm
 import helpers
+from helpers import Team, Schedule
 
 T = TypeVar('T')
-
-Schedule = Sequence[Sequence[str]]
 
 WARN_MIN_GAP = 2
 NO_PERMUTE = 'none'
@@ -26,7 +25,7 @@ NO_PERMUTE_ADJUSTER = 'none'
 
 @dataclasses.dataclass(frozen=True)
 class TeamBreaks:
-    tla: str
+    tla: Team
     breaks: Sequence[int]
 
     @functools.cached_property
@@ -60,7 +59,7 @@ def _sort_key(value: TeamBreaks) -> tuple[int, int, helpers.HumanSortTuple]:
 
 
 def compute_breaks(schedule: Schedule) -> list[TeamBreaks]:
-    matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
+    matches: DefaultDict[Team, list[int]] = collections.defaultdict(list)
 
     for match_num, teams in enumerate(schedule, start=1):
         for tla in teams:
@@ -192,9 +191,7 @@ def main(
     permute: str = NO_PERMUTE,
     permute_adjuster: str = NO_PERMUTE_ADJUSTER,
 ) -> None:
-    lines: Sequence[str] = helpers.load_lines(schedule_file)
-
-    schedule: Schedule = [tuple(x.split(helpers.SEPARATOR)) for x in lines]
+    schedule = helpers.load_schedule(schedule_file)
 
     min_breaks = compute_breaks(schedule)
 

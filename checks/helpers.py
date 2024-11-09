@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import re
-from typing import Tuple, Union
+from typing import Tuple, Union, NewType
 from pathlib import Path
+from collections.abc import Sequence
 
 HumanSortTuple = Tuple[Union[str, int], ...]
+
+Team = NewType('Team', str)
+
+Schedule = Sequence[Sequence[Team]]
 
 COMMENT_CHAR = '#'
 SEPARATOR = '|'
@@ -19,6 +24,20 @@ def load_lines(file_path: Path) -> list[str]:
                 lines.append(text)
 
     return lines
+
+
+def parse_schedule(lines: list[str]) -> Schedule:
+    return [
+        tuple(
+            Team(t)
+            for t in x.split(SEPARATOR)
+        )
+        for x in lines
+    ]
+
+
+def load_schedule(file_path: Path) -> Schedule:
+    return parse_schedule(load_lines(file_path))
 
 
 def human_sort_key(text: str) -> HumanSortTuple:
