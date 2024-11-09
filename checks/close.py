@@ -62,13 +62,9 @@ def _sort_key(value: TeamBreaks) -> tuple[int, int, helpers.HumanSortTuple]:
 def compute_breaks(schedule: Schedule) -> list[TeamBreaks]:
     matches: DefaultDict[str, list[int]] = collections.defaultdict(list)
 
-    match_num = 1
-
-    for teams in schedule:
+    for match_num, teams in enumerate(schedule, start=1):
         for tla in teams:
             matches[tla].append(match_num)
-
-        match_num += 1
 
     min_breaks = []
 
