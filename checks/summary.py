@@ -9,6 +9,7 @@ from pathlib import Path
 import close
 import faced
 import corners
+import feasible
 import overlaps
 import matches_per_team
 
@@ -18,6 +19,7 @@ CHECKS = [
     ("Corner allocations", corners),
     ("Matches per team", matches_per_team),
     ("Overlaps", overlaps),
+    ("Feasibility", feasible),
 ]
 
 
