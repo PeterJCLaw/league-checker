@@ -131,6 +131,7 @@ class ReversingAdjuster:
 
 class SubsetAdjuster:
     whole: Schedule
+    # TODO: add a way for these to be specified externally (probably CLI arguments)
     start = 46
     end = 68
 
