@@ -20,7 +20,7 @@ setup(
 
     packages=['checks'],
 
-    requires=[
+    install_requires=[
         'tqdm',
     ],
 
